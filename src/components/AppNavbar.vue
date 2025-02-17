@@ -1,24 +1,37 @@
 <script setup lang="ts">
 import { useTheme } from "vuetify";
+import { useAuthStore } from "@/stores/auth";
+import { ref, computed } from "vue";
 
 const theme = useTheme();
 const drawer = ref(false);
-const isAuthenticated = ref(false); // This should be connected to your auth state management
+const auth = useAuthStore();
+
+const isAuthenticated = computed(() => auth.isAuthenticated);
 
 const toggleTheme = () => {
   theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
 };
 
-const toggleAuth = () => {
-  isAuthenticated.value = !isAuthenticated.value;
+const handleAuth = () => {
+  if (isAuthenticated.value) {
+    auth.logout();
+  } else {
+    auth.login();
+  }
 };
 
-// Navigation items array for easy maintenance
-const navItems = [
+// Navigation items array - show protected routes only when authenticated
+const navItems = computed(() => [
   { title: "Home", icon: "mdi-home", to: "/" },
-  { title: "Perfil", icon: "mdi-account", to: "/profile" },
+  ...(isAuthenticated.value
+    ? [
+        { title: "Dashboard", icon: "mdi-view-dashboard", to: "/dashboard" },
+        { title: "Perfil", icon: "mdi-account", to: "/profile" },
+      ]
+    : []),
   { title: "API", icon: "mdi-api", to: "/api-doc" },
-];
+]);
 </script>
 
 <template>
@@ -33,32 +46,29 @@ const navItems = [
       />
 
       <v-list-item
-        @click="toggleAuth"
         :prepend-icon="isAuthenticated ? 'mdi-logout' : 'mdi-login'"
         :title="isAuthenticated ? 'Logout' : 'Login'"
+        @click="handleAuth"
       />
 
       <v-list-item
-        @click="toggleTheme"
         :prepend-icon="
           theme.global.current.value.dark
             ? 'mdi-weather-sunny'
             : 'mdi-weather-night'
         "
         :title="theme.global.current.value.dark ? 'Light' : 'Dark'"
+        @click="toggleTheme"
       />
     </v-list>
   </v-navigation-drawer>
 
   <v-app-bar>
-    <v-app-bar-nav-icon
-      @click="drawer = !drawer"
-      class="d-sm-none"
-    ></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon class="d-sm-none" @click="drawer = !drawer" />
 
     <v-app-bar-title>NFE Fácil</v-app-bar-title>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
 
     <!-- Hide these buttons on xs screens -->
     <div class="d-none d-sm-flex">
@@ -75,7 +85,7 @@ const navItems = [
       <v-btn
         :prepend-icon="isAuthenticated ? 'mdi-logout' : 'mdi-login'"
         variant="text"
-        @click="toggleAuth"
+        @click="handleAuth"
       >
         {{ isAuthenticated ? "Logout" : "Login" }}
       </v-btn>
