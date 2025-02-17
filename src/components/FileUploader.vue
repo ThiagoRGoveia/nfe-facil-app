@@ -4,13 +4,12 @@ interface Props {
   accept?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   maxFiles: 20,
   accept: ".xml",
 });
 
 const files = ref<File[]>([]);
-const fileInput = ref();
 
 const emit = defineEmits<{
   (e: "update:files", files: File[]): void;
@@ -22,10 +21,10 @@ const onFilesChanged = () => {
   emit("change", files.value);
 };
 
-const clearFiles = () => {
-  files.value = [];
-  onFilesChanged();
-};
+// const clearFiles = () => {
+//   files.value = [];
+//   onFilesChanged();
+// };
 
 const hasFiles = computed(() => files.value.length > 0);
 const filesCount = computed(() => files.value.length);
@@ -34,13 +33,14 @@ const dropZoneText = computed(() => {
   if (!hasFiles.value) {
     return "Drop files here or click to upload";
   }
-  return `${filesCount.value} file${filesCount.value === 1 ? "" : "s"} selected`;
+  return `${filesCount.value} file${
+    filesCount.value === 1 ? "" : "s"
+  } selected`;
 });
 </script>
 
 <template>
   <v-file-input
-    ref="fileInput"
     v-model="files"
     :accept="accept"
     :max-files="maxFiles"
@@ -54,12 +54,20 @@ const dropZoneText = computed(() => {
     :class="{ 'has-files': hasFiles }"
     @change="onFilesChanged"
   >
-    <template v-slot:prepend>
-      <v-icon color="primary" size="large">mdi-cloud-upload</v-icon>
+    <template #prepend>
+      <v-icon
+        color="primary"
+        size="large"
+      >
+        mdi-cloud-upload
+      </v-icon>
     </template>
 
-    <template v-slot:selection="{ fileNames }">
-      <template v-for="fileName in fileNames" :key="fileName">
+    <template #selection="{ fileNames }">
+      <template
+        v-for="fileName in fileNames"
+        :key="fileName"
+      >
         <v-chip
           size="small"
           label
@@ -72,13 +80,22 @@ const dropZoneText = computed(() => {
       </template>
     </template>
 
-    <template v-slot:default="{ isActive }">
-      <div class="drop-zone" :class="{ 'drop-zone--active': isActive }">
+    <template #default="{ isActive }">
+      <div
+        class="drop-zone"
+        :class="{ 'drop-zone--active': isActive }"
+      >
         <div class="text-center">
-          <v-icon size="48" color="primary" class="mb-3">
+          <v-icon
+            size="48"
+            color="primary"
+            class="mb-3"
+          >
             mdi-cloud-upload-outline
           </v-icon>
-          <div class="text-h6">{{ dropZoneText }}</div>
+          <div class="text-h6">
+            {{ dropZoneText }}
+          </div>
           <div class="text-body-2 text-medium-emphasis">
             Maximum {{ maxFiles }} files ({{ accept }} files only)
           </div>
