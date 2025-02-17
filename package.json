@@ -15,8 +15,11 @@
     "@apollo/client": "^3.13.1",
     "@auth0/auth0-vue": "^2.4.0",
     "@mdi/font": "7.4.47",
+    "@types/js-cookie": "^3.0.6",
+    "@vue/apollo-composable": "^4.2.1",
     "core-js": "^3.37.1",
     "graphql": "^16.10.0",
+    "js-cookie": "^3.0.5",
     "roboto-fontface": "*",
     "vue": "^3.4.31",
     "vuetify": "^3.6.14"

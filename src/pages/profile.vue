@@ -1,34 +1,13 @@
 <script lang="ts" setup>
-import { useAuth0 } from "@auth0/auth0-vue";
-import { onMounted, ref } from "vue";
-import { useCookie } from "#imports";
-import { useGraphQLUser } from "../composables/useGraphQLUser";
-import auth from "~/middleware/auth";
+import { ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
-const { isAuthenticated, logout } = useAuth0();
-const { user, loading } = useGraphQLUser();
-const userCookie = useCookie<{
-  email: string;
-  name: string;
-}>("user-session");
+const auth = useAuthStore();
 const isEditing = ref(false);
 
-onMounted(() => {
-  if (isAuthenticated.value && user.value) {
-    userCookie.value = {
-      email: user.value.email as string,
-      name: user.value.name as string,
-    };
-  }
-});
-
 const handleLogout = () => {
-  logout({ logoutParams: { returnTo: window.location.origin } });
+  auth.logout();
 };
-
-definePageMeta({
-  middleware: auth,
-});
 </script>
 
 <template>
@@ -44,12 +23,12 @@ definePageMeta({
         </button>
       </div>
 
-      <div v-if="loading" class="text-center py-8">Loading...</div>
+      <div v-if="auth.isLoading" class="text-center py-8">Loading...</div>
 
-      <div v-else-if="user" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div v-else-if="auth.user" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <section>
           <ProfileCard
-            :user="user"
+            :user="auth.user"
             :is-editing="isEditing"
             @toggle-edit="isEditing = !isEditing"
           />
