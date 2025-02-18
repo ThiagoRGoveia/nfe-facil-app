@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
 
 interface ProductFeature {
   name: string;
@@ -14,7 +13,7 @@ interface Product {
   features: ProductFeature[];
 }
 
-const props = defineProps<{
+defineProps<{
   products: Product[];
   ctaText?: string;
 }>();

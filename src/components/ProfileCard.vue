@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { User } from "~/graphql/generated/graphql";
+import type { User } from '@/graphql/generated/graphql';
+
 
 const props = defineProps<{
   user: User;
@@ -7,14 +8,6 @@ const props = defineProps<{
 
 const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
 
-const formatDate = (isoDate?: string) => {
-  if (!isoDate) return "N/A";
-  return new Date(isoDate).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
 </script>
 
 <template>

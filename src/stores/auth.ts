@@ -57,16 +57,19 @@ export const useAuthStore = defineStore("auth", () => {
           }, 50);
         });
       }
-
       if (auth0.isAuthenticated.value && auth0.user.value) {
         auth0User.value = auth0.user.value;
         // Fetch GraphQL user data
         try {
           user.value = await fetchGraphQLUser();
         } catch (err) {
-          console.error("Failed to fetch GraphQL user:", err);
+          console.error("Failed to fetch user:", err);
           // Don't throw here, as we still have basic auth0 user data
         }
+      } else {
+        // User is not authenticated, redirect to login
+        await loginWithRedirect();
+        return; // Stop execution as we're redirecting
       }
     } catch (err) {
       error.value = err as Error;
