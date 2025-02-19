@@ -28,7 +28,10 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <v-form @submit.prevent="handleSubmit" v-model="isValid">
+  <v-form
+    v-model="isValid"
+    @submit.prevent="handleSubmit"
+  >
     <v-container>
       <v-row>
         <v-col cols="12">

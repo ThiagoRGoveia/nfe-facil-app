@@ -14,9 +14,11 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  query FindAllBatchProcesses($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllBatchProcesses(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        status\n        totalFiles\n        processedFiles\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": typeof types.FindAllBatchProcessesDocument,
     "\n  query GetUser {\n    getUser {\n      id\n      email\n      name\n      surname\n      credits\n    }\n  }\n": typeof types.GetUserDocument,
 };
 const documents: Documents = {
+    "\n  query FindAllBatchProcesses($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllBatchProcesses(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        status\n        totalFiles\n        processedFiles\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": types.FindAllBatchProcessesDocument,
     "\n  query GetUser {\n    getUser {\n      id\n      email\n      name\n      surname\n      credits\n    }\n  }\n": types.GetUserDocument,
 };
 
@@ -34,6 +36,10 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query FindAllBatchProcesses($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllBatchProcesses(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        status\n        totalFiles\n        processedFiles\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n"): (typeof documents)["\n  query FindAllBatchProcesses($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllBatchProcesses(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        status\n        totalFiles\n        processedFiles\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

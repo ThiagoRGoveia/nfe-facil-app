@@ -31,12 +31,27 @@ const groupedProducts = computed(() => {
 
 <template>
   <div>
-    <v-carousel cycle height="300">
-      <v-carousel-item v-for="(group, index) in groupedProducts" :key="index">
+    <v-carousel
+      cycle
+      height="300"
+    >
+      <v-carousel-item
+        v-for="(group, index) in groupedProducts"
+        :key="index"
+      >
         <v-row>
-          <v-col v-for="(product, idx) in group" :key="idx" cols="12" md="4">
+          <v-col
+            v-for="(product, idx) in group"
+            :key="idx"
+            cols="12"
+            md="4"
+          >
             <v-card outlined>
-              <v-img :src="product.image" alt="Product image" height="200" />
+              <v-img
+                :src="product.image"
+                alt="Product image"
+                height="200"
+              />
               <v-card-title class="headline">
                 {{ product.name }}
               </v-card-title>
@@ -50,10 +65,20 @@ const groupedProducts = computed(() => {
                     :key="fIdx"
                   >
                     <v-list-item-icon>
-                      <v-icon size="16" color="green" v-if="feature.included"
-                        >mdi-check</v-icon
+                      <v-icon
+                        v-if="feature.included"
+                        size="16"
+                        color="green"
                       >
-                      <v-icon size="16" color="red" v-else>mdi-close</v-icon>
+                        mdi-check
+                      </v-icon>
+                      <v-icon
+                        v-else
+                        size="16"
+                        color="red"
+                      >
+                        mdi-close
+                      </v-icon>
                     </v-list-item-icon>
                     <v-list-item-content>
                       <v-list-item-title class="subtitle-1">
@@ -72,7 +97,10 @@ const groupedProducts = computed(() => {
       </v-carousel-item>
     </v-carousel>
     <div class="mt-6 text-center">
-      <v-btn color="primary" large>
+      <v-btn
+        color="primary"
+        large
+      >
         {{ ctaText || "Learn More" }}
       </v-btn>
     </div>

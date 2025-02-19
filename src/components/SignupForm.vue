@@ -1,8 +1,14 @@
 <template>
-  <v-form @submit.prevent="handleSubmit" v-model="isValid">
+  <v-form
+    v-model="isValid"
+    @submit.prevent="handleSubmit"
+  >
     <v-container>
       <v-row>
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-text-field
             v-model="form.name"
             label="Name"
@@ -11,7 +17,10 @@
             required
           />
         </v-col>
-        <v-col cols="12" md="6">
+        <v-col
+          cols="12"
+          md="6"
+        >
           <v-text-field
             v-model="form.surname"
             label="Surname"

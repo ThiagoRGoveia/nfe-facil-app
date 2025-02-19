@@ -27,6 +27,7 @@ const navItems = computed(() => [
   ...(isAuthenticated.value
     ? [
         { title: "Dashboard", icon: "mdi-view-dashboard", to: "/dashboard" },
+        { title: "History", icon: "mdi-history", to: "/history" },
         { title: "Perfil", icon: "mdi-account", to: "/profile" },
       ]
     : []),
@@ -35,7 +36,10 @@ const navItems = computed(() => [
 </script>
 
 <template>
-  <v-navigation-drawer v-model="drawer" temporary>
+  <v-navigation-drawer
+    v-model="drawer"
+    temporary
+  >
     <v-list>
       <v-list-item
         v-for="item in navItems"
@@ -64,7 +68,10 @@ const navItems = computed(() => [
   </v-navigation-drawer>
 
   <v-app-bar>
-    <v-app-bar-nav-icon class="d-sm-none" @click="drawer = !drawer" />
+    <v-app-bar-nav-icon
+      class="d-sm-none"
+      @click="drawer = !drawer"
+    />
 
     <v-app-bar-title>NFE Fácil</v-app-bar-title>
 

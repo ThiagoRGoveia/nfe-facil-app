@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+
+
 const mockProducts = ref([
   {
     name: "Basic Package",
@@ -38,14 +40,14 @@ const mockProducts = ref([
     ],
   },
 ]);
-
-const isLoading = ref(false);
 </script>
 
 <template>
   <div class="container mx-auto px-4 py-8">
     <section class="max-w-3xl mx-auto mt-16">
-      <h1 class="text-4xl font-bold text-center mb-8">NFe Fácil</h1>
+      <h1 class="text-4xl font-bold text-center mb-8">
+        NFe Fácil
+      </h1>
       <ConversionForm title="Solte seus arquvos aqui" />
     </section>
 
@@ -53,7 +55,10 @@ const isLoading = ref(false);
       <h2 class="text-2xl text-center mb-12">
         Extraia dados da sua nota fiscal
       </h2>
-      <PricingTable :products="mockProducts" ctaText="Começar Agora" />
+      <PricingTable
+        :products="mockProducts"
+        cta-text="Começar Agora"
+      />
     </section>
   </div>
 </template>

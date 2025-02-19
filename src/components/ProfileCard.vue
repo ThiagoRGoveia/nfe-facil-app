@@ -12,35 +12,57 @@ const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
 
 <template>
   <v-card class="profile-card">
-    <v-card-title class="text-h5 pb-2"> Hello {{ fullName }} </v-card-title>
+    <v-card-title class="text-h5 pb-2">
+      Hello {{ fullName }}
+    </v-card-title>
 
     <v-card-text>
       <v-list>
         <v-list-item>
-          <template v-slot:prepend>
-            <v-icon color="primary" class="me-3">mdi-email</v-icon>
+          <template #prepend>
+            <v-icon
+              color="primary"
+              class="me-3"
+            >
+              mdi-email
+            </v-icon>
           </template>
           <v-list-item-title>Email</v-list-item-title>
           <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
         </v-list-item>
 
         <v-list-item>
-          <template v-slot:prepend>
-            <v-icon color="primary" class="me-3">mdi-login</v-icon>
+          <template #prepend>
+            <v-icon
+              color="primary"
+              class="me-3"
+            >
+              mdi-login
+            </v-icon>
           </template>
           <v-list-item-title>Sign-up Method</v-list-item-title>
         </v-list-item>
 
         <v-list-item>
-          <template v-slot:prepend>
-            <v-icon color="primary" class="me-3">mdi-star</v-icon>
+          <template #prepend>
+            <v-icon
+              color="primary"
+              class="me-3"
+            >
+              mdi-star
+            </v-icon>
           </template>
           <v-list-item-title>Current Plan</v-list-item-title>
         </v-list-item>
 
         <v-list-item>
-          <template v-slot:prepend>
-            <v-icon color="primary" class="me-3">mdi-currency-usd</v-icon>
+          <template #prepend>
+            <v-icon
+              color="primary"
+              class="me-3"
+            >
+              mdi-currency-usd
+            </v-icon>
           </template>
           <v-list-item-title>Available Credits</v-list-item-title>
           <v-list-item-subtitle>

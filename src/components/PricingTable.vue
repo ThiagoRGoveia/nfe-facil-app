@@ -47,7 +47,7 @@ defineProps<{
                 </div>
               </div>
 
-              <v-divider class="mb-4"></v-divider>
+              <v-divider class="mb-4" />
 
               <v-list density="compact">
                 <v-list-item
@@ -55,7 +55,7 @@ defineProps<{
                   :key="fIdx"
                   class="px-2"
                 >
-                  <template v-slot:prepend>
+                  <template #prepend>
                     <v-icon
                       :color="feature.included ? 'success' : 'error'"
                       size="small"

@@ -3,7 +3,7 @@ interface Props {
   title: string;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const files = ref<File[]>([]);
 const selectedFormats = ref<string[]>([]);
@@ -34,10 +34,16 @@ const handleSubmit = () => {
       </v-card-title>
 
       <v-card-text>
-        <FileUploader v-model:files="files" accept=".xml" class="mb-6" />
+        <FileUploader
+          v-model:files="files"
+          accept=".xml"
+          class="mb-6"
+        />
 
         <v-container class="px-0">
-          <v-label class="text-subtitle-1 mb-2">Output Formats</v-label>
+          <v-label class="text-subtitle-1 mb-2">
+            Output Formats
+          </v-label>
           <v-row>
             <v-col
               v-for="format in outputFormats"

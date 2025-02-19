@@ -7,10 +7,11 @@ interface Props {
   required?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+ withDefaults(defineProps<Props>(), {
   label: "Password",
   rules: () => [],
   required: false,
+  hint: undefined,
 });
 
 const emit = defineEmits<{
@@ -27,14 +28,14 @@ const updateValue = (value: string) => {
 <template>
   <v-text-field
     :model-value="modelValue"
-    @update:model-value="updateValue"
     :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
     :type="showPassword ? 'text' : 'password'"
     :label="label"
     :rules="rules"
     variant="outlined"
     :required="required"
-    @click:append="showPassword = !showPassword"
     :hint="hint"
+    @update:model-value="updateValue"
+    @click:append="showPassword = !showPassword"
   />
 </template>
