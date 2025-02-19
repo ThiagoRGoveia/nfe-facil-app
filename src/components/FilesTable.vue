@@ -135,7 +135,7 @@ onMounted(() => {
         location="top"
         text="Download file"
       >
-        <template #activator="{ props }">
+        <template #activator>
           <v-btn
             density="comfortable"
             icon="mdi-download-circle-outline"

@@ -24,10 +24,10 @@ const handleAuth = () => {
 // Navigation items array - show protected routes only when authenticated
 const navItems = computed(() => [
   { title: "Home", icon: "mdi-home", to: "/" },
+  { title: "Public (TESTE)", icon: "mdi-file-document-outline", to: "/public" },
   ...(isAuthenticated.value
     ? [
-        { title: "Dashboard", icon: "mdi-view-dashboard", to: "/dashboard" },
-        { title: "History", icon: "mdi-history", to: "/history" },
+        { title: "Histórico", icon: "mdi-history", to: "/history" },
         { title: "Perfil", icon: "mdi-account", to: "/profile" },
       ]
     : []),

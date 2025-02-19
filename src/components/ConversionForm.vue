@@ -27,22 +27,22 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <v-form @submit.prevent="handleSubmit">
-    <v-card class="pa-4">
+  <v-form @submit.prevent="handleSubmit" class="h-full">
+    <v-card class="pa-4 h-full">
       <v-card-title class="text-h5 mb-4">
-        {{ title }}
+        Adicione seus arquivos em formato PDF ou ZIP
       </v-card-title>
 
-      <v-card-text>
+      <v-card-text class="d-flex flex-column h-100">
         <FileUploader
           v-model:files="files"
           accept=".xml"
-          class="mb-6"
+          class="mb-6 flex-grow-1"
         />
 
         <v-container class="px-0">
           <v-label class="text-subtitle-1 mb-2">
-            Output Formats
+            Escolha os formatos desejados
           </v-label>
           <v-row>
             <v-col
@@ -66,7 +66,7 @@ const handleSubmit = () => {
           block
           :disabled="files.length === 0 || selectedFormats.length === 0"
         >
-          Convert Files
+          Extrair dados
         </v-btn>
       </v-card-text>
     </v-card>
@@ -75,7 +75,15 @@ const handleSubmit = () => {
 
 <style scoped>
 .v-card {
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.h-100 {
+  height: 100%;
 }
 </style>

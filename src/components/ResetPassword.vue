@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import { useMutation } from "@vue/apollo-composable";
+import { UPDATE_USER_PASSWORD } from "@/graphql/user";
+import { useAuthStore } from "@/stores/auth";
+import { computed } from "vue";
+
+const auth = useAuthStore();
+const userId = computed(() => auth.user?.id);
+
 const form = reactive({
   password: "",
   confirmPassword: "",
@@ -14,16 +22,30 @@ const rules = {
   passwordMatch: (v: string) => v === form.password || "Passwords must match",
 };
 
-const emit = defineEmits<{
-  (e: "submit", password: string): void;
-}>();
+const { mutate: updatePassword, onDone, onError } = useMutation(UPDATE_USER_PASSWORD);
+
+onDone(() => {
+  loading.value = false;
+  form.password = "";
+  form.confirmPassword = "";
+});
+
+onError((error) => {
+  loading.value = false;
+  console.error("Failed to update password:", error);
+});
 
 const handleSubmit = () => {
-  if (!isValid.value) return;
+  if (!isValid.value || !userId.value) return;
 
   loading.value = true;
-  emit("submit", form.password);
-  loading.value = false;
+  updatePassword({
+    id: userId.value,
+    input: {
+      currentPassword: form.password,
+      newPassword: form.confirmPassword,
+    },
+  });
 };
 </script>
 
@@ -32,26 +54,41 @@ const handleSubmit = () => {
     v-model="isValid"
     @submit.prevent="handleSubmit"
   >
-    <v-container>
+    <v-card
+      class="pa-4"
+      elevation="0"
+    >
       <v-row>
-        <v-col cols="12">
+        <v-col
+          cols="12"
+          sm="8"
+          md="8"
+        >
           <PasswordInput
             v-model="form.password"
-            label="New Password"
+            label="Nova Senha"
             :rules="[rules.required, rules.password]"
             required
-            hint="Password must be at least 8 characters long"
+            hint="A senha deve conter pelo menos 8 caracteres"
           />
         </v-col>
-        <v-col cols="12">
+        <v-col
+          cols="12"
+          sm="8"
+          md="8"
+        >
           <PasswordInput
             v-model="form.confirmPassword"
-            label="Confirm Password"
+            label="Confirmar Nova Senha"
             :rules="[rules.required, rules.passwordMatch]"
             required
           />
         </v-col>
-        <v-col cols="12">
+        <v-col
+          cols="12"
+          sm="8"
+          md="8"
+        >
           <v-btn
             type="submit"
             color="primary"
@@ -59,17 +96,17 @@ const handleSubmit = () => {
             :disabled="!isValid"
             :loading="loading"
           >
-            Reset Password
+            Atualizar Senha
           </v-btn>
         </v-col>
       </v-row>
-    </v-container>
+    </v-card>
   </v-form>
 </template>
 
 <style scoped>
 .v-form {
-  max-width: 500px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
 </style>

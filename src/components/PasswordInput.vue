@@ -28,7 +28,6 @@ const updateValue = (value: string) => {
 <template>
   <v-text-field
     :model-value="modelValue"
-    :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
     :type="showPassword ? 'text' : 'password'"
     :label="label"
     :rules="rules"
@@ -37,5 +36,14 @@ const updateValue = (value: string) => {
     :hint="hint"
     @update:model-value="updateValue"
     @click:append="showPassword = !showPassword"
-  />
+  >
+    <template #append-inner>
+      <v-btn
+        icon
+        variant="text"
+      >
+        <v-icon>{{ showPassword ? 'mdi-eye' : 'mdi-eye-off' }}</v-icon>
+      </v-btn>
+    </template>
+  </v-text-field>
 </template>

@@ -1,11 +1,11 @@
 import { useQuery } from "@vue/apollo-composable";
-import { GetUserQuery } from "../graphql/user";
+import { GET_USER } from "../graphql/user";
 import type { User } from "../graphql/generated/graphql";
 import { computed, ref } from "vue";
 
 export const useGraphQLUser = () => {
   const initialized = ref(false);
-  const { result, loading, error, refetch } = useQuery(GetUserQuery, {
+  const { result, loading, error, refetch } = useQuery(GET_USER, {
     fetchPolicy: "network-only",
   });
 

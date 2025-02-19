@@ -11,9 +11,9 @@ const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
 </script>
 
 <template>
-  <v-card class="profile-card">
-    <v-card-title class="text-h5 pb-2">
-      Hello {{ fullName }}
+  <v-card elevation="2">
+    <v-card-title class="text-h5">
+      Olá {{ fullName }}
     </v-card-title>
 
     <v-card-text>
@@ -22,7 +22,7 @@ const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
           <template #prepend>
             <v-icon
               color="primary"
-              class="me-3"
+              class="mr-3"
             >
               mdi-email
             </v-icon>
@@ -35,36 +35,37 @@ const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
           <template #prepend>
             <v-icon
               color="primary"
-              class="me-3"
+              class="mr-3"
             >
               mdi-login
             </v-icon>
           </template>
           <v-list-item-title>Sign-up Method</v-list-item-title>
+          <v-list-item-subtitle>{{ user.isSocial ? 'Social' : 'Email' }}</v-list-item-subtitle>
         </v-list-item>
 
         <v-list-item>
           <template #prepend>
             <v-icon
               color="primary"
-              class="me-3"
+              class="mr-3"
             >
               mdi-star
             </v-icon>
           </template>
-          <v-list-item-title>Current Plan</v-list-item-title>
+          <v-list-item-title>Plano</v-list-item-title>
         </v-list-item>
 
         <v-list-item>
           <template #prepend>
             <v-icon
               color="primary"
-              class="me-3"
+              class="mr-3"
             >
               mdi-currency-usd
             </v-icon>
           </template>
-          <v-list-item-title>Available Credits</v-list-item-title>
+          <v-list-item-title>Créditos Disponíveis</v-list-item-title>
           <v-list-item-subtitle>
             <v-chip
               :color="user.credits > 0 ? 'success' : 'error'"
@@ -79,14 +80,3 @@ const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
     </v-card-text>
   </v-card>
 </template>
-
-<style scoped>
-.profile-card {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.v-list-item {
-  min-height: 64px;
-}
-</style>
