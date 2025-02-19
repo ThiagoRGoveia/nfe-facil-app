@@ -11,9 +11,16 @@ const props = defineProps<{
 const showSecret = ref(false);
 const isRefreshing = ref(false);
 const clientId = computed(() => props.user.clientId);
-const clientSecret = computed(() => props.user.clientSecret);
+const localClientSecret = ref(props.user.clientSecret);
+const clientSecret = computed(() => localClientSecret.value);
 
-const { mutate: refreshSecret } = useMutation(REFRESH_CLIENT_SECRET);
+const { mutate: refreshSecret } = useMutation<{ refreshUserClientSecret: { clientSecret: string } }>(REFRESH_CLIENT_SECRET, {
+  update: (cache, { data }) => {
+    if (data?.refreshUserClientSecret) {
+      localClientSecret.value = data.refreshUserClientSecret.clientSecret;
+    }
+  },
+});
 
 const toggleSecret = () => {
   showSecret.value = !showSecret.value;
@@ -26,14 +33,19 @@ const copyToClipboard = (text: string) => {
 const handleRefreshSecret = async () => {
   isRefreshing.value = true;
   try {
-    await refreshSecret({
+    const result = await refreshSecret({
       id: props.user.id
     });
+    if (result && 'data' in result) {
+      if (result.data?.refreshUserClientSecret) {
+        localClientSecret.value = result.data.refreshUserClientSecret.clientSecret;
+        showSecret.value = true; // Show the new secret automatically
+      }
+    }
   } catch (error) {
     console.error('Failed to refresh client secret:', error);
   } finally {
     isRefreshing.value = false;
-    showSecret.value = false;
   }
 };
 

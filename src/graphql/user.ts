@@ -25,6 +25,7 @@ export const REFRESH_CLIENT_SECRET = gql`
   mutation RefreshUserClientSecret($id: String!) {
     refreshUserClientSecret(id: $id) {
       id
+      clientId
       clientSecret
     }
   }

@@ -31,7 +31,7 @@ const isEditing = ref(false);
       </v-col>
 
       <v-col 
-        v-if="auth.user.isSocial"
+        v-if="!auth.user.isSocial"
         cols="12"
       >
         <v-card elevation="2">
