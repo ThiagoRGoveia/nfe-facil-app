@@ -18,6 +18,7 @@ declare module 'vue' {
     PricingTable: typeof import('./components/PricingTable.vue')['default']
     ProductCaroulsel: typeof import('./components/ProductCaroulsel.vue')['default']
     ProfileCard: typeof import('./components/ProfileCard.vue')['default']
+    PublicConversionForm: typeof import('./components/PublicConversionForm.vue')['default']
     ResetPassword: typeof import('./components/ResetPassword.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

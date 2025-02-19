@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-
 const mockProducts = ref([
   {
     name: "Basic Package",
@@ -44,14 +43,17 @@ const mockProducts = ref([
 
 <template>
   <div class="container mx-auto px-4 py-8">
+    <section class="max-w-3xl mx-auto mt-16 h-[600px]">
+      <div class="h-[calc(100%-4rem)]">
+        <PublicConversionForm title="Solte seus arquivos aqui" />
+      </div>
+    </section>
+
     <section class="mb-16">
       <h2 class="text-2xl text-center mb-12">
         Extraia os dados da sua Nota Fiscal Eletrônica
       </h2>
-      <PricingTable
-        :products="mockProducts"
-        cta-text="Começar Agora"
-      />
+      <PricingTable :products="mockProducts" cta-text="Começar Agora" />
     </section>
   </div>
 </template>
