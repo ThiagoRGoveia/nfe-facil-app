@@ -6,19 +6,17 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   maxFiles: 20,
-  accept: ".xml",
+  accept: ".pdf,.zip",
 });
 
 const files = ref<File[]>([]);
 
 const emit = defineEmits<{
   (e: "update:files", files: File[]): void;
-  (e: "change", files: File[]): void;
 }>();
 
 const onFilesChanged = () => {
   emit("update:files", files.value);
-  emit("change", files.value);
 };
 
 // const clearFiles = () => {
@@ -52,7 +50,7 @@ const dropZoneText = computed(() => {
     truncate-length="25"
     class="file-uploader"
     :class="{ 'has-files': hasFiles }"
-    @change="onFilesChanged"
+    @update:model-value="onFilesChanged"
   >
     <template #prepend>
       <v-icon
@@ -97,7 +95,7 @@ const dropZoneText = computed(() => {
             {{ dropZoneText }}
           </div>
           <div class="text-body-2 text-medium-emphasis">
-            Maximum {{ maxFiles }} files ({{ accept }} files only)
+            Máximo de {{ maxFiles }} arquivos ({{ accept }} apenas)
           </div>
         </div>
       </div>

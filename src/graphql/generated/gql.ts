@@ -16,6 +16,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 type Documents = {
     "\n  query FindAllBatchProcesses($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllBatchProcesses(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        status\n        totalFiles\n        processedFiles\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": typeof types.FindAllBatchProcessesDocument,
     "\n  query FindAllFiles($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllFiles(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        fileName\n        filePath\n        status\n        result\n        error\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": typeof types.FindAllFilesDocument,
+    "\n  mutation ProcessBatchSync($input: CreateBatchInput!) {\n    processBatchSync(input: $input) {\n      id\n    }\n  }\n": typeof types.ProcessBatchSyncDocument,
+    "\n  mutation PublicProcessBatchSync($input: CreateBatchInput!) {\n    publicProcessBatchSync(input: $input) {\n      json\n      csv\n      excel\n    }\n  }\n": typeof types.PublicProcessBatchSyncDocument,
     "\n  query GetUser {\n    getUser {\n      id\n      email\n      name\n      surname\n      credits\n      isSocial\n      clientId\n      clientSecret\n    }\n  }\n": typeof types.GetUserDocument,
     "\n  mutation UpdateUserPassword($id: String!, $input: UpdatePasswordDto!) {\n    updateUserPassword(id: $id, input: $input)\n  }\n": typeof types.UpdateUserPasswordDocument,
     "\n  mutation RefreshUserClientSecret($id: String!) {\n    refreshUserClientSecret(id: $id) {\n      id\n      clientId\n      clientSecret\n    }\n  }\n": typeof types.RefreshUserClientSecretDocument,
@@ -23,6 +25,8 @@ type Documents = {
 const documents: Documents = {
     "\n  query FindAllBatchProcesses($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllBatchProcesses(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        status\n        totalFiles\n        processedFiles\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": types.FindAllBatchProcessesDocument,
     "\n  query FindAllFiles($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllFiles(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        fileName\n        filePath\n        status\n        result\n        error\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": types.FindAllFilesDocument,
+    "\n  mutation ProcessBatchSync($input: CreateBatchInput!) {\n    processBatchSync(input: $input) {\n      id\n    }\n  }\n": types.ProcessBatchSyncDocument,
+    "\n  mutation PublicProcessBatchSync($input: CreateBatchInput!) {\n    publicProcessBatchSync(input: $input) {\n      json\n      csv\n      excel\n    }\n  }\n": types.PublicProcessBatchSyncDocument,
     "\n  query GetUser {\n    getUser {\n      id\n      email\n      name\n      surname\n      credits\n      isSocial\n      clientId\n      clientSecret\n    }\n  }\n": types.GetUserDocument,
     "\n  mutation UpdateUserPassword($id: String!, $input: UpdatePasswordDto!) {\n    updateUserPassword(id: $id, input: $input)\n  }\n": types.UpdateUserPasswordDocument,
     "\n  mutation RefreshUserClientSecret($id: String!) {\n    refreshUserClientSecret(id: $id) {\n      id\n      clientId\n      clientSecret\n    }\n  }\n": types.RefreshUserClientSecretDocument,
@@ -50,6 +54,14 @@ export function gql(source: "\n  query FindAllBatchProcesses($pagination: Pagina
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  query FindAllFiles($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllFiles(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        fileName\n        filePath\n        status\n        result\n        error\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n"): (typeof documents)["\n  query FindAllFiles($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllFiles(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        fileName\n        filePath\n        status\n        result\n        error\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation ProcessBatchSync($input: CreateBatchInput!) {\n    processBatchSync(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation ProcessBatchSync($input: CreateBatchInput!) {\n    processBatchSync(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation PublicProcessBatchSync($input: CreateBatchInput!) {\n    publicProcessBatchSync(input: $input) {\n      json\n      csv\n      excel\n    }\n  }\n"): (typeof documents)["\n  mutation PublicProcessBatchSync($input: CreateBatchInput!) {\n    publicProcessBatchSync(input: $input) {\n      json\n      csv\n      excel\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

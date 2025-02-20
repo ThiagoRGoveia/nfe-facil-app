@@ -159,7 +159,9 @@ onMounted(() => {
 
     <template #item.status="{ item }">
       <v-chip
-        :color="(item as FileItem).status === 'COMPLETED' ? 'success' : (item as FileItem).status === 'FAILED' ? 'error' : 'warning'"
+        :color="(item as FileItem).status === 'COMPLETED' ?
+         'success' : (item as FileItem).status === 'FAILED' ? 
+         'error' : 'warning'"
         size="small"
       >
         {{ (item as FileItem).status }}

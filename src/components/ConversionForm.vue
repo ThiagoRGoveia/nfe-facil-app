@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { FileFormat } from "@/graphql/generated/graphql";
 interface Props {
   title: string;
 }
@@ -6,19 +8,23 @@ interface Props {
 defineProps<Props>();
 
 const files = ref<File[]>([]);
-const selectedFormats = ref<string[]>([]);
+const selectedFormats = ref<FileFormat[]>(['JSON']);
 
 const outputFormats = [
-  { label: "JSON", value: "json" },
-  { label: "CSV", value: "csv" },
-  { label: "XLSX", value: "xlsx" },
+  { label: "JSON", value: "JSON" },
+  { label: "CSV", value: "CSV" },
+  { label: "XLSX", value: "XLSX" },
 ];
 
 const emit = defineEmits<{
-  (e: "submit", data: { files: File[]; formats: string[] }): void;
+  (e: "submit", data: { files: File[]; formats: FileFormat[] }): void;
 }>();
 
 const handleSubmit = () => {
+  console.log(selectedFormats.value);
+  console.log(files.value);
+  if (files.value.length === 0 || selectedFormats.value.length === 0) return;
+  
   emit("submit", {
     files: files.value,
     formats: selectedFormats.value,
@@ -27,7 +33,10 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <v-form @submit.prevent="handleSubmit" class="h-full">
+  <v-form
+    class="h-full"
+    @submit.prevent="handleSubmit"
+  >
     <v-card class="pa-4 h-full">
       <v-card-title class="text-h5 mb-4">
         Adicione seus arquivos em formato PDF ou ZIP
@@ -36,7 +45,7 @@ const handleSubmit = () => {
       <v-card-text class="d-flex flex-column h-100">
         <FileUploader
           v-model:files="files"
-          accept=".xml"
+          accept=".pdf,.zip"
           class="mb-6 flex-grow-1"
         />
 

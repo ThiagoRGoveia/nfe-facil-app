@@ -1,10 +1,15 @@
 import { provideApolloClient } from '@vue/apollo-composable'
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core'
+import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context'
 import { useAuthStore } from '@/stores/auth'
+import  createUploadLink  from 'apollo-upload-client/createUploadLink.mjs'
 
-const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql'
+// Create http link that supports multipart/form-data for file uploads
+const httpLink = createUploadLink({
+  uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql',
+  headers: {
+    'Apollo-Require-Preflight': 'true'
+  }
 })
 
 // Add auth headers to every request
@@ -22,8 +27,15 @@ const authLink = setContext(async (_, { headers }) => {
 const cache = new InMemoryCache()
 
 const apolloClient = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: from([authLink, httpLink]),
   cache,
+  defaultOptions: {
+    mutate: {
+      context: {
+        hasUpload: false
+      }
+    }
+  }
 })
 
 export default {

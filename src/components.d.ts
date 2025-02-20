@@ -16,6 +16,7 @@ declare module 'vue' {
     HistoryTable: typeof import('./components/HistoryTable.vue')['default']
     PasswordInput: typeof import('./components/PasswordInput.vue')['default']
     PricingTable: typeof import('./components/PricingTable.vue')['default']
+    PrivateConversionForm: typeof import('./components/PrivateConversionForm.vue')['default']
     ProductCaroulsel: typeof import('./components/ProductCaroulsel.vue')['default']
     ProfileCard: typeof import('./components/ProfileCard.vue')['default']
     PublicConversionForm: typeof import('./components/PublicConversionForm.vue')['default']

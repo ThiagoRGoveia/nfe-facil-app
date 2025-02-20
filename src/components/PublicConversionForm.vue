@@ -2,56 +2,70 @@
 import { ref } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { PUBLIC_PROCESS_BATCH } from "@/graphql/public";
-import { PublicSyncProcessResponse } from "@/graphql/generated/graphql";
+import {
+  FileFormat,
+  PublicProcessBatchSyncMutationVariables,
+  PublicSyncProcessResponse,
+} from "@/graphql/generated/graphql";
+import ConversionForm from "./ConversionForm.vue";
 
-interface Props {
-  title: string;
-}
+type ResponseData<T> = {
+  publicProcessBatchSync: T;
+};
 
-defineProps<Props>();
-
-const files = ref<File[]>([]);
-const selectedFormats = ref<string[]>([]);
 const loading = ref(false);
+const downloadingFiles = ref<Record<string, boolean>>({});
 const error = ref("");
 const downloadLinks = ref<PublicSyncProcessResponse>({});
 
-const outputFormats = [
-  { label: "JSON", value: "json" },
-  { label: "CSV", value: "csv" },
-  { label: "XLSX", value: "xlsx" },
-];
+const { mutate: processFiles } = useMutation<
+  ResponseData<PublicSyncProcessResponse>,
+  PublicProcessBatchSyncMutationVariables
+>(PUBLIC_PROCESS_BATCH, {
+  context: {
+    hasUpload: true,
+  },
+});
 
-const { mutate: processFiles } = useMutation(PUBLIC_PROCESS_BATCH);
-
-const downloadFile = (data: string, format: string) => {
-  const blob = new Blob([atob(data)], { 
-    type: format === 'json' ? 'application/json' : 
-          format === 'csv' ? 'text/csv' : 
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `converted-data.${format}`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+const downloadFile = async (url: string, format: string) => {
+  try {
+    downloadingFiles.value[format] = true;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to download ${format} file`);
+    }
+    const blob = await response.blob();
+    const downloadUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = `converted-data.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(downloadUrl);
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : `Failed to download ${format} file`;
+  } finally {
+    downloadingFiles.value[format] = false;
+  }
 };
 
-const handleSubmit = async () => {
-  if (files.value.length === 0 || selectedFormats.value.length === 0) return;
-
+const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
+  console.log(data);
   try {
     loading.value = true;
     error.value = "";
     downloadLinks.value = {};
 
     const result = await processFiles({
-      files: files.value,
-      formats: selectedFormats.value,
+      input: {
+        files: data.files,
+        outputFormats: data.formats,
+        templateId: import.meta.env.VITE_NFE_TEMPLATE,
+      },
     });
+
+    console.log(result);
 
     if (result?.data?.publicProcessBatchSync) {
       downloadLinks.value = {
@@ -69,133 +83,120 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <v-form
-    class="h-full"
-    @submit.prevent="handleSubmit"
-  >
-    <v-card class="pa-4 h-full">
-      <v-card-title class="text-h5 mb-4">
-        Adicione seus arquivos em formato PDF ou ZIP
-      </v-card-title>
+  <div class="h-full">
+    <ConversionForm
+      title="Conversão Pública de Arquivos"
+      @submit="handleSubmit"
+    />
 
-      <v-card-text class="d-flex flex-column h-100">
-        <FileUploader
-          v-model:files="files"
-          accept=".xml"
-          class="mb-6 flex-grow-1"
-        />
+    <v-alert
+      v-if="error"
+      type="error"
+      class="mt-4"
+    >
+      {{ error }}
+    </v-alert>
 
-        <v-alert
-          v-if="error"
-          type="error"
-          class="mb-4"
+    <v-container
+      v-if="Object.keys(downloadLinks).length > 0"
+      class="px-0 mt-4"
+    >
+      <v-label class="text-subtitle-1 mb-2">
+        Download Converted Files
+      </v-label>
+      <v-row>
+        <v-col
+          v-if="downloadLinks.json"
+          cols="auto"
         >
-          {{ error }}
-        </v-alert>
-
-        <v-container class="px-0">
-          <v-label class="text-subtitle-1 mb-2">
-            Escolha os formatos desejados
-          </v-label>
-          <v-row>
-            <v-col
-              v-for="format in outputFormats"
-              :key="format.value"
-              cols="auto"
-            >
-              <v-checkbox
-                v-model="selectedFormats"
-                :label="format.label"
-                :value="format.value"
-                color="primary"
-              />
-            </v-col>
-          </v-row>
-        </v-container>
-
-        <v-container
-          v-if="Object.keys(downloadLinks).length > 0"
-          class="px-0 mb-4"
+          <v-btn
+            color="primary"
+            variant="outlined"
+            class="mr-2"
+            :disabled="downloadingFiles['json']"
+            @click="downloadFile(downloadLinks.json!, 'json')"
+          >
+            <v-icon start>
+              mdi-code-json
+            </v-icon>
+            <v-progress-circular
+              v-if="downloadingFiles['json']"
+              indeterminate
+              size="20"
+              width="2"
+              color="primary"
+              class="mr-2"
+            />
+            <span>JSON</span>
+          </v-btn>
+        </v-col>
+        <v-col
+          v-if="downloadLinks.csv"
+          cols="auto"
         >
-          <v-label class="text-subtitle-1 mb-2">
-            Download Converted Files
-          </v-label>
-          <v-row>
-            <v-col
-              v-if="downloadLinks.json"
-              cols="auto"
-            >
-              <v-btn
-                color="primary"
-                variant="outlined"
-                class="mr-2"
-                @click="downloadFile(downloadLinks.json!, 'json')"
-              >
-                <v-icon start>
-                  mdi-code-json
-                </v-icon>
-                JSON
-              </v-btn>
-            </v-col>
-            <v-col
-              v-if="downloadLinks.csv"
-              cols="auto"
-            >
-              <v-btn
-                color="primary"
-                variant="outlined"
-                class="mr-2"
-                @click="downloadFile(downloadLinks.csv!, 'csv')"
-              >
-                <v-icon start>
-                  mdi-file-delimited
-                </v-icon>
-                CSV
-              </v-btn>
-            </v-col>
-            <v-col
-              v-if="downloadLinks.excel"
-              cols="auto"
-            >
-              <v-btn
-                color="primary"
-                variant="outlined"
-                @click="downloadFile(downloadLinks.excel!, 'xlsx')"
-              >
-                <v-icon start>
-                  mdi-microsoft-excel
-                </v-icon>
-                Excel
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-
-        <v-btn
-          type="submit"
-          color="primary"
-          block
-          :loading="loading"
-          :disabled="files.length === 0 || selectedFormats.length === 0 || loading"
+          <v-btn
+            color="primary"
+            variant="outlined"
+            class="mr-2"
+            :disabled="downloadingFiles['csv']"
+            @click="downloadFile(downloadLinks.csv!, 'csv')"
+          >
+            <v-icon start>
+              mdi-file-delimited
+            </v-icon>
+            <v-progress-circular
+              v-if="downloadingFiles['csv']"
+              indeterminate
+              size="20"
+              width="2"
+              color="primary"
+              class="mr-2"
+            />
+            <span>CSV</span>
+          </v-btn>
+        </v-col>
+        <v-col
+          v-if="downloadLinks.excel"
+          cols="auto"
         >
-          {{ loading ? "Processando..." : "Extrair dados" }}
-        </v-btn>
-      </v-card-text>
-    </v-card>
-  </v-form>
+          <v-btn
+            color="primary"
+            variant="outlined"
+            :disabled="downloadingFiles['excel']"
+            @click="downloadFile(downloadLinks.excel!, 'xlsx')"
+          >
+            <v-icon start>
+              mdi-microsoft-excel
+            </v-icon>
+            <v-progress-circular
+              v-if="downloadingFiles['excel']"
+              indeterminate
+              size="20"
+              width="2"
+              color="primary"
+              class="mr-2"
+            />
+            <span>Excel</span>
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-overlay
+      :model-value="loading"
+      class="align-center justify-center"
+    >
+      <v-progress-circular
+        color="primary"
+        indeterminate
+        size="64"
+      />
+    </v-overlay>
+  </div>
 </template>
 
 <style scoped>
-.v-card {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
 .h-full {
-  height: 100%;
-}
-
-.h-100 {
   height: 100%;
 }
 </style>
