@@ -3,7 +3,7 @@ import type { User } from '@/graphql/generated/graphql';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { computed } from 'vue';
-import { Mail, LogIn, Star, DollarSign } from 'lucide-vue-next';
+import { Mail, Star, DollarSign } from 'lucide-vue-next';
 
 const props = defineProps<{
   user: User;

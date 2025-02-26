@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useLazyQuery } from '@vue/apollo-composable';
 import { FIND_ALL_BATCH_PROCESSES } from '@/graphql/history';
 import type { PaginatedBatchProcessResponse } from '@/graphql/generated/graphql';
+import FilesTable from '@/components/FilesTable.vue';
 import {
   Table,
   TableBody,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -24,8 +26,17 @@ import {
   ChevronDown,
   ChevronUp,
   ChevronsUpDown,
-  X as XIcon
 } from 'lucide-vue-next';
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+} from '@/components/ui/pagination';
 
 interface HistoryItem {
   id: string;
@@ -49,6 +60,9 @@ interface TableOptions {
 // Pagination state
 const currentPage = ref(1);
 const pageSize = ref(10);
+
+// Skeleton row count for loading state
+const skeletonRowCount = 5;
 
 // Sorting state
 const sortColumn = ref('createdAt');
@@ -151,25 +165,28 @@ const toggleSort = (columnKey: string) => {
 
 const selectedItem = ref<HistoryItem | null>(null);
 const showDialog = ref(false);
+const filesTableLoaded = ref(false);
 
 const handleRowClick = (item: HistoryItem) => {
   selectedItem.value = item;
   showDialog.value = true;
+  filesTableLoaded.value = false;
   emit("row-click", item);
 };
 
-const goToPage = (page: number) => {
-  if (page < 1 || page > totalPages.value) return;
+// For pagination
+const handlePageChange = (page: number) => {
   currentPage.value = page;
 };
-
-watch(tableOptions, () => {
-  refetch();
-}, { deep: true });
 
 onMounted(() => {
   load();
 });
+
+// Function to mark the files table as loaded
+const onFilesTableMounted = () => {
+  filesTableLoaded.value = true;
+};
 
 const emit = defineEmits<{
   (e: "row-click", item: HistoryItem): void;
@@ -177,7 +194,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div>
+  <div class="relative min-h-[400px]">
     <Table>
       <TableCaption v-if="items.length === 0 && !loading">
         Nenhum item encontrado
@@ -202,19 +219,32 @@ const emit = defineEmits<{
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow
-          v-if="loading"
-          class="h-24"
-        >
-          <TableCell
-            :colspan="columns.length"
-            class="text-center"
+        <!-- Loading skeleton -->
+        <template v-if="loading && items.length === 0">
+          <TableRow
+            v-for="i in skeletonRowCount"
+            :key="`skeleton-${i}`"
+            class="hover:bg-muted/50"
           >
-            Carregando...
-          </TableCell>
-        </TableRow>
+            <TableCell>
+              <Skeleton class="h-4 w-[180px]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-4 w-[80px]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-4 w-[80px]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-6 w-24" />
+            </TableCell>
+          </TableRow>
+        </template>
+        
+        <!-- Actual data -->
         <TableRow 
-          v-for="item in items" 
+          v-for="item in items"
+          v-else-if="!loading" 
           :key="item.id" 
           class="cursor-pointer hover:bg-muted/50"
           @click="handleRowClick(item)"
@@ -236,91 +266,50 @@ const emit = defineEmits<{
         Mostrando {{ items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} até 
         {{ Math.min(currentPage * pageSize, totalItems) }} de {{ totalItems }} entradas
       </div>
-      <div
-        v-if="totalPages > 1"
-        class="flex items-center gap-1"
+      
+      <!-- New pagination component -->
+      <Pagination
+        v-if="totalPages > 0"
+        v-slot="{ page }"
+        :items-per-page="pageSize"
+        :total="totalItems"
+        :sibling-count="1"
+        show-edges
+        :default-page="currentPage"
+        @update:page="handlePageChange"
       >
-        <Button 
-          variant="outline" 
-          size="sm"
-          :disabled="currentPage === 1"
-          @click="goToPage(currentPage - 1)"
+        <PaginationList
+          v-slot="{ items }"
+          class="flex items-center gap-1"
         >
-          Anterior
-        </Button>
-        
-        <div v-if="totalPages <= 5">
-          <Button 
-            v-for="page in totalPages" 
-            :key="page"
-            size="sm"
-            :variant="currentPage === page ? 'default' : 'outline'"
-            @click="goToPage(page)"
-          >
-            {{ page }}
-          </Button>
-        </div>
-        
-        <div v-else>
-          <!-- First page always visible -->
-          <Button 
-            size="sm"
-            :variant="currentPage === 1 ? 'default' : 'outline'"
-            @click="goToPage(1)"
-          >
-            1
-          </Button>
-          
-          <!-- Ellipsis if needed -->
-          <span
-            v-if="currentPage > 3"
-            class="mx-1"
-          >...</span>
-          
-          <!-- Pages around current -->
-          <template
-            v-for="(page, index) in [
-              Math.max(2, currentPage - 1), 
-              currentPage !== 1 && currentPage !== totalPages ? currentPage : null, 
-              Math.min(totalPages - 1, currentPage + 1)
-            ]"
-            :key="index"
-          >
-            <Button 
-              v-if="page !== null"
-              size="sm"
-              :variant="currentPage === page ? 'default' : 'outline'"
-              @click="goToPage(page)"
+          <PaginationFirst />
+          <PaginationPrev />
+
+          <template v-for="(item, index) in items">
+            <PaginationListItem
+              v-if="item.type === 'page'"
+              :key="index"
+              :value="item.value"
+              as-child
             >
-              {{ page }}
-            </Button>
+              <Button
+                class="w-9 h-9 p-0"
+                :variant="item.value === page ? 'default' : 'outline'"
+              >
+                {{ item.value }}
+              </Button>
+            </PaginationListItem>
+            <PaginationEllipsis
+              v-else
+              :key="item.type"
+              :index="index"
+            />
           </template>
-          
-          <!-- Ellipsis if needed -->
-          <span
-            v-if="currentPage < totalPages - 2"
-            class="mx-1"
-          >...</span>
-          
-          <!-- Last page always visible -->
-          <Button 
-            size="sm"
-            :variant="currentPage === totalPages ? 'default' : 'outline'"
-            @click="goToPage(totalPages)"
-          >
-            {{ totalPages }}
-          </Button>
-        </div>
-        
-        <Button 
-          variant="outline" 
-          size="sm"
-          :disabled="currentPage === totalPages"
-          @click="goToPage(currentPage + 1)"
-        >
-          Próximo
-        </Button>
-      </div>
+
+          <PaginationNext />
+          <PaginationLast />
+        </PaginationList>
+      </Pagination>
     </div>
 
     <Dialog v-model:open="showDialog">
@@ -331,6 +320,7 @@ const emit = defineEmits<{
         <FilesTable
           v-if="selectedItem"
           :batch-id="selectedItem.id"
+          @vue:mounted="onFilesTableMounted"
         />
       </DialogContent>
     </Dialog>

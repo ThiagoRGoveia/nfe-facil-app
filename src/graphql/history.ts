@@ -28,6 +28,7 @@ export const FIND_ALL_FILES = gql`
         status
         result
         error
+        createdAt
       }
       page
       pageSize
