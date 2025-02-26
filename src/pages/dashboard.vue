@@ -10,9 +10,8 @@ import PrivateConversionForm from '@/components/PrivateConversionForm.vue';
 import HistoryTable from '@/components/HistoryTable.vue';
 import ProfileCard from '@/components/ProfileCard.vue';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import Skeleton from '@/components/ui/skeleton/Skeleton.vue';
 
 import {
   LayoutDashboard,
@@ -22,7 +21,6 @@ import {
   Key,
   FileJson,
   ChevronRight,
-  Activity,
   Loader2,
   AlertCircle
 } from 'lucide-vue-next';
@@ -31,7 +29,7 @@ const router = useRouter();
 const auth = useAuthStore();
 
 // Fetch recent conversions for stats
-const { load, result, loading } = useLazyQuery<{ findAllBatchProcesses: PaginatedBatchProcessResponse }>(
+const { load, result } = useLazyQuery<{ findAllBatchProcesses: PaginatedBatchProcessResponse }>(
   FIND_ALL_BATCH_PROCESSES,
   {
     pagination: {
@@ -49,7 +47,7 @@ const { load, result, loading } = useLazyQuery<{ findAllBatchProcesses: Paginate
 );
 
 // Compute dashboard statistics based on query results
-const stats = computed(() => {
+computed(() => {
   if (!result.value) return { total: 0, completed: 0, success: 0 };
   
   const items = result.value.findAllBatchProcesses.items || [];

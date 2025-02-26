@@ -8,7 +8,8 @@ import { PaginationFirst, type PaginationFirstProps } from 'reka-ui'
 import { computed, type HTMLAttributes } from 'vue'
 
 const props = withDefaults(defineProps<PaginationFirstProps & { class?: HTMLAttributes['class'] }>(), {
-  asChild: true,
+    class: '',
+    asChild: true,
 })
 
 const delegatedProps = computed(() => {

@@ -9,6 +9,7 @@ import { computed, type HTMLAttributes } from 'vue'
 
 const props = withDefaults(defineProps<PaginationPrevProps & { class?: HTMLAttributes['class'] }>(), {
   asChild: true,
+  class: '',
 })
 
 const delegatedProps = computed(() => {

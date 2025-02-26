@@ -23,11 +23,20 @@ export default [
 
   {
     rules: {
+      '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-unused-expressions': [
         'error',
         {
           allowShortCircuit: true,
           allowTernary: true,
+        },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
         },
       ],
       'vue/multi-word-component-names': 'off',

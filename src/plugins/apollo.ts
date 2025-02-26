@@ -1,5 +1,5 @@
 import { provideApolloClient } from '@vue/apollo-composable'
-import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/client/core'
+import { ApolloClient, InMemoryCache, from } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context'
 import { useAuthStore } from '@/stores/auth'
 import  createUploadLink  from 'apollo-upload-client/createUploadLink.mjs'

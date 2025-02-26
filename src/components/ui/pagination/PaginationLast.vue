@@ -8,7 +8,8 @@ import { PaginationLast, type PaginationLastProps } from 'reka-ui'
 import { computed, type HTMLAttributes } from 'vue'
 
 const props = withDefaults(defineProps<PaginationLastProps & { class?: HTMLAttributes['class'] }>(), {
-  asChild: true,
+    class: '',
+    asChild: true,
 })
 
 const delegatedProps = computed(() => {

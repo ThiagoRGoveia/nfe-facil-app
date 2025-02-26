@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useLazyQuery } from '@vue/apollo-composable';
 import { FIND_ALL_FILES } from '@/graphql/history';
 import type { FileProcessStatus, FileToProcess } from '@/graphql/generated/graphql';
@@ -74,7 +74,7 @@ const tableOptions = computed<TableOptions>(() => ({
   sortBy: [{ key: sortColumn.value, order: sortDirection.value }],
 }));
 
-const { load, result, loading, refetch } = useLazyQuery(FIND_ALL_FILES, () => ({
+const { load, result, loading } = useLazyQuery(FIND_ALL_FILES, () => ({
   pagination: {
     page: tableOptions.value.page,
     pageSize: tableOptions.value.itemsPerPage,
@@ -132,6 +132,8 @@ const getBadgeVariant = (status: FileProcessStatus) => {
   switch(status) {
     case 'COMPLETED': return 'secondary';
     case 'FAILED': return 'destructive';
+    case 'PENDING': return 'default';
+    case 'PROCESSING': return 'default';
     default: return 'default';
   }
 };

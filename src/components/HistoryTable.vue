@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed,  onMounted } from 'vue';
 import { useLazyQuery } from '@vue/apollo-composable';
 import { FIND_ALL_BATCH_PROCESSES } from '@/graphql/history';
-import type { PaginatedBatchProcessResponse } from '@/graphql/generated/graphql';
+import type { BatchStatus, PaginatedBatchProcessResponse } from '@/graphql/generated/graphql';
 import FilesTable from '@/components/FilesTable.vue';
 import {
   Table,
@@ -75,7 +75,7 @@ const tableOptions = computed<TableOptions>(() => ({
   sortBy: [{ key: sortColumn.value, order: sortDirection.value }],
 }));
 
-const { load, result, loading, refetch } = useLazyQuery<{ findAllBatchProcesses: PaginatedBatchProcessResponse }>(
+const { load, result, loading } = useLazyQuery<{ findAllBatchProcesses: PaginatedBatchProcessResponse }>(
   FIND_ALL_BATCH_PROCESSES,
   () => ({
     pagination: {
@@ -94,7 +94,7 @@ const { load, result, loading, refetch } = useLazyQuery<{ findAllBatchProcesses:
   }
 );
 
-const items = computed(() => {
+const itemsComputed = computed(() => {
   const batchProcesses = result.value?.findAllBatchProcesses.items ?? [];
   return batchProcesses.map(item => ({
     id: item.id,
@@ -141,11 +141,25 @@ const formatDate = (isoDate: string) => {
   });
 };
 
-const getBadgeVariant = (status: string) => {
+const getBadgeVariant = (status: BatchStatus) => {
   switch(status) {
     case 'COMPLETED': return 'secondary';
     case 'FAILED': return 'destructive';
+    case 'PROCESSING': return 'default';
+    case 'CANCELLED': return 'destructive';
+    case 'CREATED': return 'default';
     default: return 'default';
+  }
+};
+
+const getStatusLabel = (status: BatchStatus) => {
+  switch(status) {
+    case 'COMPLETED': return 'Concluído';
+    case 'FAILED': return 'Falhou';
+    case 'PROCESSING': return 'Processando';
+    case 'CANCELLED': return 'Cancelado';
+    case 'CREATED': return 'Criado';
+    default: return status;
   }
 };
 
@@ -196,7 +210,7 @@ const emit = defineEmits<{
 <template>
   <div class="relative min-h-[400px]">
     <Table>
-      <TableCaption v-if="items.length === 0 && !loading">
+      <TableCaption v-if="itemsComputed.length === 0 && !loading">
         Nenhum item encontrado
       </TableCaption>
       <TableHeader>
@@ -220,7 +234,7 @@ const emit = defineEmits<{
       </TableHeader>
       <TableBody>
         <!-- Loading skeleton -->
-        <template v-if="loading && items.length === 0">
+        <template v-if="loading && itemsComputed.length === 0">
           <TableRow
             v-for="i in skeletonRowCount"
             :key="`skeleton-${i}`"
@@ -243,7 +257,7 @@ const emit = defineEmits<{
         
         <!-- Actual data -->
         <TableRow 
-          v-for="item in items"
+          v-for="item in itemsComputed"
           v-else-if="!loading" 
           :key="item.id" 
           class="cursor-pointer hover:bg-muted/50"
@@ -254,7 +268,7 @@ const emit = defineEmits<{
           <TableCell>{{ item.processedFiles }}</TableCell>
           <TableCell>
             <Badge :variant="getBadgeVariant(item.status)">
-              {{ item.status }}
+              {{ getStatusLabel(item.status) }}
             </Badge>
           </TableCell>
         </TableRow>
@@ -263,7 +277,7 @@ const emit = defineEmits<{
 
     <div class="flex items-center justify-between space-x-2 py-4">
       <div class="flex-1 text-sm text-muted-foreground">
-        Mostrando {{ items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} até 
+        Mostrando {{ itemsComputed.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} até 
         {{ Math.min(currentPage * pageSize, totalItems) }} de {{ totalItems }} entradas
       </div>
       
