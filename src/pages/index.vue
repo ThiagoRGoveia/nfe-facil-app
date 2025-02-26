@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useAuthStore } from "@/stores/auth";
+import { Loader2 } from "lucide-vue-next";
 
 const auth = useAuthStore();
 </script>
@@ -8,12 +9,9 @@ const auth = useAuthStore();
   <div class="container mx-auto px-4 py-8 h-full">
     <div
       v-if="auth.isLoading"
-      class="text-center py-8"
+      class="flex items-center justify-center py-8"
     >
-      <v-progress-circular
-        indeterminate
-        size="64"
-      />
+      <Loader2 class="h-16 w-16 animate-spin text-primary" />
     </div>
 
     <div
@@ -25,7 +23,7 @@ const auth = useAuthStore();
           Extraia os dados da sua Nota Fiscal Eletrônica
         </h2>
         <div class="h-[calc(100%-4rem)]">
-          <ConversionForm title="Solte seus arquvos aqui" />
+          <ConversionForm title="Solte seus arquivos aqui" />
         </div>
       </section>
     </div>

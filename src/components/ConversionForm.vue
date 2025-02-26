@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { FileFormat } from "@/graphql/generated/graphql";
+import FileUploader from "./FileUploader.vue";
+
 interface Props {
   title: string;
 }
@@ -9,6 +16,7 @@ defineProps<Props>();
 
 const files = ref<File[]>([]);
 const selectedFormats = ref<FileFormat[]>(['JSON']);
+const formError = ref("");
 
 const outputFormats = [
   { label: "JSON", value: "JSON" },
@@ -20,10 +28,32 @@ const emit = defineEmits<{
   (e: "submit", data: { files: File[]; formats: FileFormat[] }): void;
 }>();
 
+const toggleFormat = (format: FileFormat, checked: boolean) => {
+  if (checked) {
+    selectedFormats.value.push(format);
+  } else {
+    selectedFormats.value = selectedFormats.value.filter(f => f !== format);
+  }
+};
+
+const isFormatSelected = (format: FileFormat) => {
+  return selectedFormats.value.includes(format);
+};
+
 const handleSubmit = () => {
-  console.log(selectedFormats.value);
-  console.log(files.value);
-  if (files.value.length === 0 || selectedFormats.value.length === 0) return;
+  // Reset previous errors
+  formError.value = "";
+  
+  // Validate form
+  if (files.value.length === 0) {
+    formError.value = "Please upload at least one file";
+    return;
+  }
+  
+  if (selectedFormats.value.length === 0) {
+    formError.value = "Please select at least one output format";
+    return;
+  }
   
   emit("submit", {
     files: files.value,
@@ -33,66 +63,75 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <v-form
-    class="h-full"
-    @submit.prevent="handleSubmit"
-  >
-    <v-card class="pa-4 h-full">
-      <v-card-title class="text-h5 mb-4">
-        Adicione seus arquivos em formato PDF ou ZIP
-      </v-card-title>
-
-      <v-card-text class="d-flex flex-column h-100">
-        <FileUploader
-          v-model:files="files"
-          accept=".pdf,.zip"
-          class="mb-6 flex-grow-1"
-        />
-
-        <v-container class="px-0">
-          <v-label class="text-subtitle-1 mb-2">
-            Escolha os formatos desejados
-          </v-label>
-          <v-row>
-            <v-col
-              v-for="format in outputFormats"
-              :key="format.value"
-              cols="auto"
-            >
-              <v-checkbox
-                v-model="selectedFormats"
-                :label="format.label"
-                :value="format.value"
-                color="primary"
+  <Form @submit.prevent="handleSubmit" class="h-full">
+    <Card class="h-full">
+      <CardHeader>
+        <CardTitle>{{ title }}</CardTitle>
+      </CardHeader>
+      
+      <CardContent class="flex flex-col space-y-6 flex-grow">
+        <FormField name="files">
+          <FormItem>
+            <FormControl>
+              <FileUploader
+                v-model:files="files"
+                accept=".pdf,.zip"
+                class="flex-grow"
               />
-            </v-col>
-          </v-row>
-        </v-container>
+            </FormControl>
+            <FormMessage v-if="files.length === 0 && formError">
+              {{ formError }}
+            </FormMessage>
+          </FormItem>
+        </FormField>
 
-        <v-btn
+        <FormField name="formats">
+          <FormItem>
+            <FormLabel class="text-base font-medium mb-2 block">
+              Escolha os formatos desejados
+            </FormLabel>
+            
+            <div class="flex flex-wrap gap-4 mt-2">
+              <div 
+                v-for="format in outputFormats"
+                :key="format.value"
+                class="flex items-center space-x-2"
+              >
+                <Checkbox 
+                  :id="`format-${format.value}`"
+                  :checked="isFormatSelected(format.value as FileFormat)"
+                  @update:checked="(checked: boolean) => toggleFormat(format.value as FileFormat, checked)"
+                />
+                <Label 
+                  :for="`format-${format.value}`"
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {{ format.label }}
+                </Label>
+              </div>
+            </div>
+            <FormMessage v-if="selectedFormats.length === 0 && formError">
+              {{ formError }}
+            </FormMessage>
+          </FormItem>
+        </FormField>
+      </CardContent>
+      
+      <CardFooter>
+        <Button
           type="submit"
-          color="primary"
-          block
+          class="w-full"
           :disabled="files.length === 0 || selectedFormats.length === 0"
         >
           Extrair dados
-        </v-btn>
-      </v-card-text>
-    </v-card>
-  </v-form>
+        </Button>
+      </CardFooter>
+    </Card>
+  </Form>
 </template>
 
 <style scoped>
-.v-card {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.h-full {
-  height: 100%;
-}
-
-.h-100 {
+form {
   height: 100%;
 }
 </style>

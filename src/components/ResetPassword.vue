@@ -2,10 +2,19 @@
 import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_USER_PASSWORD } from "@/graphql/user";
 import { useAuthStore } from "@/stores/auth";
-import { computed } from "vue";
+import { computed, ref, reactive, watch } from "vue";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import PasswordInput from "./PasswordInput.vue";
+import { Form } from "@/components/ui/form";
 
 const auth = useAuthStore();
 const userId = computed(() => auth.user?.id);
+const loading = ref(false);
+const errors = reactive({
+  password: "",
+  confirmPassword: ""
+});
 
 const form = reactive({
   password: "",
@@ -13,14 +22,18 @@ const form = reactive({
 });
 
 const isValid = ref(false);
-const loading = ref(false);
 
-const rules = {
-  required: (v: string) => !!v || "This field is required",
-  password: (v: string) =>
-    v.length >= 8 || "Password must be at least 8 characters",
-  passwordMatch: (v: string) => v === form.password || "Passwords must match",
-};
+// Validate form
+watch([() => form.password, () => form.confirmPassword], ([password, confirmPassword]) => {
+  errors.password = !password ? "Password is required" : 
+                    password.length < 8 ? "Password must be at least 8 characters" : "";
+  
+  errors.confirmPassword = !confirmPassword ? "Confirmation is required" : 
+                           confirmPassword !== password ? "Passwords must match" : "";
+  
+  isValid.value = !errors.password && !errors.confirmPassword && 
+                  !!password && !!confirmPassword;
+}, { immediate: true });
 
 const { mutate: updatePassword, onDone, onError } = useMutation(UPDATE_USER_PASSWORD);
 
@@ -37,7 +50,7 @@ onError((error) => {
 
 const handleSubmit = () => {
   if (!isValid.value || !userId.value) return;
-
+  
   loading.value = true;
   updatePassword({
     id: userId.value,
@@ -50,62 +63,67 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <v-form
-    v-model="isValid"
-    @submit.prevent="handleSubmit"
-  >
-    <v-card
-      class="pa-4"
-      elevation="0"
-    >
-      <v-row>
-        <v-col
-          cols="12"
-          sm="8"
-          md="8"
-        >
-          <PasswordInput
-            v-model="form.password"
-            label="Nova Senha"
-            :rules="[rules.required, rules.password]"
-            required
-            hint="A senha deve conter pelo menos 8 caracteres"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          sm="8"
-          md="8"
-        >
-          <PasswordInput
-            v-model="form.confirmPassword"
-            label="Confirmar Nova Senha"
-            :rules="[rules.required, rules.passwordMatch]"
-            required
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          sm="8"
-          md="8"
-        >
-          <v-btn
+  <Form class="w-full" @submit.prevent="handleSubmit">
+    <Card class="p-6">
+      <div class="grid gap-6 md:grid-cols-8">
+        <div class="md:col-span-6">
+          <div class="space-y-2">
+            <label 
+              for="password" 
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Nova Senha
+            </label>
+            <PasswordInput
+              id="password"
+              v-model="form.password"
+              required
+              hint="A senha deve conter pelo menos 8 caracteres"
+            />
+            <p v-if="errors.password" class="text-sm font-medium text-destructive">
+              {{ errors.password }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="md:col-span-6">
+          <div class="space-y-2">
+            <label 
+              for="confirmPassword" 
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Confirmar Nova Senha
+            </label>
+            <PasswordInput
+              id="confirmPassword"
+              v-model="form.confirmPassword"
+              required
+            />
+            <p v-if="errors.confirmPassword" class="text-sm font-medium text-destructive">
+              {{ errors.confirmPassword }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="md:col-span-6">
+          <Button
             type="submit"
-            color="primary"
-            block
+            class="w-full"
             :disabled="!isValid"
-            :loading="loading"
           >
+            <span v-if="loading" class="mr-2">
+              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em]"></span>
+            </span>
             Atualizar Senha
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-form>
+          </Button>
+        </div>
+      </div>
+    </Card>
+  </Form>
 </template>
 
 <style scoped>
-.v-form {
+form {
   width: 100%;
   margin: 0;
 }

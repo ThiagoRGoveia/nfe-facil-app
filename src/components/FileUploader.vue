@@ -1,28 +1,97 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CloudUpload, X } from 'lucide-vue-next';
+
 interface Props {
   maxFiles?: number;
   accept?: string;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   maxFiles: 20,
   accept: ".pdf,.zip",
 });
 
+const fileInput = ref<HTMLInputElement | null>(null);
 const files = ref<File[]>([]);
+const dragActive = ref(false);
 
 const emit = defineEmits<{
   (e: "update:files", files: File[]): void;
 }>();
 
-const onFilesChanged = () => {
+const onFilesChanged = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.files) {
+    // Convert FileList to Array and append to existing files
+    const newFiles = Array.from(input.files);
+    
+    // Check if adding these files would exceed maxFiles
+    if (files.value.length + newFiles.length > props.maxFiles) {
+      alert(`You can only upload a maximum of ${props.maxFiles} files.`);
+      return;
+    }
+    
+    files.value = [...files.value, ...newFiles];
+    emit("update:files", files.value);
+  }
+};
+
+const removeFile = (index: number) => {
+  files.value = files.value.filter((_, i) => i !== index);
   emit("update:files", files.value);
 };
 
-// const clearFiles = () => {
-//   files.value = [];
-//   onFilesChanged();
-// };
+const clearFiles = () => {
+  files.value = [];
+  emit("update:files", files.value);
+};
+
+const onDragEnter = (e: DragEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dragActive.value = true;
+};
+
+const onDragLeave = (e: DragEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dragActive.value = false;
+};
+
+const onDragOver = (e: DragEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dragActive.value = true;
+};
+
+const onDrop = (e: DragEvent) => {
+  e.preventDefault();
+  e.stopPropagation();
+  dragActive.value = false;
+  
+  if (e.dataTransfer?.files) {
+    const newFiles = Array.from(e.dataTransfer.files);
+    
+    // Check if adding these files would exceed maxFiles
+    if (files.value.length + newFiles.length > props.maxFiles) {
+      alert(`You can only upload a maximum of ${props.maxFiles} files.`);
+      return;
+    }
+    
+    files.value = [...files.value, ...newFiles];
+    emit("update:files", files.value);
+  }
+};
+
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
 
 const hasFiles = computed(() => files.value.length > 0);
 const filesCount = computed(() => files.value.length);
@@ -35,102 +104,112 @@ const dropZoneText = computed(() => {
     filesCount.value === 1 ? "" : "s"
   } selected`;
 });
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
 </script>
 
 <template>
-  <v-file-input
-    v-model="files"
-    :accept="accept"
-    :max-files="maxFiles"
-    multiple
-    clearable
-    chips
-    counter
-    show-size
-    truncate-length="25"
-    class="file-uploader"
-    :class="{ 'has-files': hasFiles }"
-    @update:model-value="onFilesChanged"
-  >
-    <template #prepend>
-      <v-icon
-        color="primary"
-        size="large"
-      >
-        mdi-cloud-upload
-      </v-icon>
-    </template>
-
-    <template #selection="{ fileNames }">
-      <template
-        v-for="fileName in fileNames"
-        :key="fileName"
-      >
-        <v-chip
-          size="small"
-          label
-          color="primary"
-          variant="outlined"
-          class="me-2"
+  <div class="file-uploader w-full">
+    <div 
+      class="drop-zone border-2 border-dashed rounded-lg p-6 transition-colors" 
+      :class="{ 
+        'border-primary/50 bg-primary/5': dragActive,
+        'border-muted-foreground/25 hover:border-primary/50': !dragActive 
+      }"
+      @dragenter="onDragEnter" 
+      @dragleave="onDragLeave" 
+      @dragover="onDragOver" 
+      @drop="onDrop"
+    >
+      <Input 
+        ref="fileInput"
+        type="file" 
+        :accept="accept" 
+        multiple 
+        class="hidden" 
+        @change="onFilesChanged"
+      />
+      
+      <div v-if="!hasFiles" class="flex flex-col items-center justify-center space-y-4 py-12">
+        <CloudUpload class="h-12 w-12 text-primary" />
+        <div class="text-xl font-medium">{{ dropZoneText }}</div>
+        <div class="text-sm text-muted-foreground">
+          Maximum of {{ maxFiles }} files ({{ accept }} only)
+        </div>
+        <Button 
+          variant="outline" 
+          type="button" 
+          @click="triggerFileInput"
         >
-          {{ fileName }}
-        </v-chip>
-      </template>
-    </template>
-
-    <template #default="{ isActive }">
-      <div
-        class="drop-zone"
-        :class="{ 'drop-zone--active': isActive }"
-      >
-        <div class="text-center">
-          <v-icon
-            size="48"
-            color="primary"
-            class="mb-3"
-          >
-            mdi-cloud-upload-outline
-          </v-icon>
-          <div class="text-h6">
-            {{ dropZoneText }}
+          Select Files
+        </Button>
+      </div>
+      
+      <div v-else class="space-y-4">
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-xl font-medium">{{ dropZoneText }}</div>
+          <div class="flex space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              type="button" 
+              @click="triggerFileInput"
+            >
+              Add More
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              type="button" 
+              @click="clearFiles"
+            >
+              Clear All
+            </Button>
           </div>
-          <div class="text-body-2 text-medium-emphasis">
-            Máximo de {{ maxFiles }} arquivos ({{ accept }} apenas)
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div 
+            v-for="(file, index) in files" 
+            :key="index"
+            class="flex items-center gap-2 bg-muted/30 rounded-md p-2"
+          >
+            <Badge variant="outline" class="text-xs truncate max-w-[200px]">
+              {{ file.name }}
+            </Badge>
+            <span class="text-xs text-muted-foreground">
+              {{ formatFileSize(file.size) }}
+            </span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              class="h-6 w-6 ml-auto" 
+              @click="removeFile(index)"
+            >
+              <X class="h-3 w-3" />
+            </Button>
           </div>
         </div>
       </div>
-    </template>
-  </v-file-input>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .file-uploader {
-  --drop-zone-height: 300px;
-}
-
-.file-uploader :deep(.v-field__input) {
-  min-height: var(--drop-zone-height) !important;
-  align-items: center;
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.file-uploader.has-files :deep(.v-field__input) {
-  min-height: unset !important;
+  width: 100%;
 }
 
 .drop-zone {
+  min-height: 300px;
   width: 100%;
-  padding: 24px;
-  transition: all 0.2s ease-in-out;
-}
-
-.drop-zone--active {
-  background-color: rgb(var(--v-theme-primary) / 0.05);
-  border-radius: 4px;
-}
-
-.v-chip {
-  max-width: 200px;
 }
 </style>

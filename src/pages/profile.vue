@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-vue-next";
 
 const auth = useAuthStore();
 const isEditing = ref(false);
@@ -8,48 +10,49 @@ const isEditing = ref(false);
 
 <template>
   <div>
-    <div class="d-flex justify-space-between align-center mb-6">
-      <h1 class="text-h4 font-weight-bold">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">
         Perfil
       </h1>
     </div>
 
     <div
       v-if="auth.isLoading"
-      class="d-flex justify-center align-center py-8"
+      class="flex justify-center items-center py-8"
     >
-      <v-progress-circular indeterminate />
+      <Loader2 class="h-8 w-8 animate-spin text-primary" />
     </div>
 
-    <v-row v-else-if="auth.user">
-      <v-col cols="12">
+    <div v-else-if="auth.user" class="grid gap-6">
+      <div>
         <ProfileCard
           :user="auth.user"
           :is-editing="isEditing"
           @toggle-edit="isEditing = !isEditing"
         />
-      </v-col>
+      </div>
 
-      <v-col 
-        v-if="!auth.user.isSocial"
-        cols="12"
-      >
-        <v-card elevation="2">
-          <v-card-title>Segurança</v-card-title>
-          <v-card-text>
+      <div v-if="!auth.user.isSocial">
+        <Card>
+          <CardHeader>
+            <CardTitle>Segurança</CardTitle>
+          </CardHeader>
+          <CardContent>
             <ResetPassword />
-          </v-card-text>
-        </v-card>
-      </v-col>
+          </CardContent>
+        </Card>
+      </div>
 
-      <v-col cols="12">
-        <v-card elevation="2">
-          <v-card-title>API</v-card-title>
-          <v-card-text>
+      <div>
+        <Card>
+          <CardHeader>
+            <CardTitle>API</CardTitle>
+          </CardHeader>
+          <CardContent>
             <ApiCredentials :user="auth.user" />
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   </div>
 </template>

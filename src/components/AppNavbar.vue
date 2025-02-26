@@ -1,17 +1,30 @@
 <script setup lang="ts">
-import { useTheme } from "vuetify";
-import { useAuthStore } from "@/stores/auth";
 import { ref, computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useDark, useToggle } from "@vueuse/core";
+import { useRouter } from "vue-router";
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { MoonIcon, SunIcon, MenuIcon } from "lucide-vue-next";
 
-const theme = useTheme();
-const drawer = ref(false);
+const isDark = useDark();
+const toggleDark = useToggle(isDark);
+const mobileMenuOpen = ref(false);
 const auth = useAuthStore();
+const router = useRouter();
 
 const isAuthenticated = computed(() => auth.isAuthenticated);
-
-const toggleTheme = () => {
-  theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
-};
 
 const handleAuth = () => {
   if (isAuthenticated.value) {
@@ -23,91 +36,100 @@ const handleAuth = () => {
 
 // Navigation items array - show protected routes only when authenticated
 const navItems = computed(() => [
-  { title: "Home", icon: "mdi-home", to: "/" },
-  { title: "Public (TESTE)", icon: "mdi-file-document-outline", to: "/public" },
+  { title: "Home", icon: "home", to: "/" },
+  { title: "Public (TESTE)", icon: "file", to: "/public" },
   ...(isAuthenticated.value
     ? [
-        { title: "Histórico", icon: "mdi-history", to: "/history" },
-        { title: "Perfil", icon: "mdi-account", to: "/profile" },
+        { title: "Histórico", icon: "history", to: "/history" },
+        { title: "Perfil", icon: "user", to: "/profile" },
       ]
     : []),
-  { title: "API", icon: "mdi-api", to: "/api-doc" },
+  { title: "API", icon: "code", to: "/api-doc" },
 ]);
+
+const navigateTo = (path: string) => {
+  router.push(path);
+  mobileMenuOpen.value = false;
+};
 </script>
 
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    temporary
-  >
-    <v-list>
-      <v-list-item
-        v-for="item in navItems"
-        :key="item.title"
-        :to="item.to"
-        :prepend-icon="item.icon"
-        :title="item.title"
-      />
+  <!-- Mobile Menu (Sheet component from shadcn) -->
+  <Sheet v-model:open="mobileMenuOpen" class="lg:hidden">
+    <SheetTrigger asChild>
+      <Button variant="ghost" size="icon" class="lg:hidden">
+        <MenuIcon class="h-6 w-6" />
+        <span class="sr-only">Toggle menu</span>
+      </Button>
+    </SheetTrigger>
+    <SheetContent side="left" class="w-[240px] sm:w-[300px]">
+      <nav class="flex flex-col gap-4 mt-8">
+        <Button 
+          v-for="item in navItems" 
+          :key="item.title" 
+          variant="ghost" 
+          class="w-full justify-start"
+          @click="navigateTo(item.to)"
+        >
+          {{ item.title }}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          class="w-full justify-start"
+          @click="handleAuth"
+        >
+          {{ isAuthenticated ? "Logout" : "Login" }}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          class="w-full justify-start"
+          @click="toggleDark()"
+        >
+          <SunIcon v-if="isDark" class="h-5 w-5 mr-2" />
+          <MoonIcon v-else class="h-5 w-5 mr-2" />
+          {{ isDark ? "Light" : "Dark" }}
+        </Button>
+      </nav>
+    </SheetContent>
+  </Sheet>
 
-      <v-list-item
-        :prepend-icon="isAuthenticated ? 'mdi-logout' : 'mdi-login'"
-        :title="isAuthenticated ? 'Logout' : 'Login'"
-        @click="handleAuth"
-      />
-
-      <v-list-item
-        :prepend-icon="
-          theme.global.current.value.dark
-            ? 'mdi-weather-sunny'
-            : 'mdi-weather-night'
-        "
-        :title="theme.global.current.value.dark ? 'Light' : 'Dark'"
-        @click="toggleTheme"
-      />
-    </v-list>
-  </v-navigation-drawer>
-
-  <v-app-bar>
-    <v-app-bar-nav-icon
-      class="d-sm-none"
-      @click="drawer = !drawer"
-    />
-
-    <v-app-bar-title>NFE Fácil</v-app-bar-title>
-
-    <v-spacer />
-
-    <!-- Hide these buttons on xs screens -->
-    <div class="d-none d-sm-flex">
-      <v-btn
-        v-for="item in navItems"
-        :key="item.title"
-        :to="item.to"
-        :prepend-icon="item.icon"
-        variant="text"
-      >
-        {{ item.title }}
-      </v-btn>
-
-      <v-btn
-        :prepend-icon="isAuthenticated ? 'mdi-logout' : 'mdi-login'"
-        variant="text"
-        @click="handleAuth"
-      >
-        {{ isAuthenticated ? "Logout" : "Login" }}
-      </v-btn>
-
-      <v-btn
-        :prepend-icon="
-          theme.global.current.value.dark
-            ? 'mdi-weather-sunny'
-            : 'mdi-weather-night'
-        "
-        variant="text"
-        @click="toggleTheme"
-      >
-        {{ theme.global.current.value.dark ? "Light" : "Dark" }}
-      </v-btn>
+  <!-- Desktop Navigation -->
+  <header class="border-b sticky top-0 z-40 w-full bg-background">
+    <div class="container flex h-16 items-center px-4 sm:px-6">
+      <div class="mr-4 font-bold text-lg">NFE Fácil</div>
+      
+      <!-- Desktop Navigation Menu -->
+      <NavigationMenu class="hidden lg:flex ml-auto">
+        <NavigationMenuList>
+          <NavigationMenuItem v-for="item in navItems" :key="item.title">
+            <NavigationMenuLink 
+              :class="navigationMenuTriggerStyle()"
+              @click="navigateTo(item.to)"
+            >
+              {{ item.title }}
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          
+          <NavigationMenuItem>
+            <NavigationMenuLink 
+              :class="navigationMenuTriggerStyle()"
+              @click="handleAuth"
+            >
+              {{ isAuthenticated ? "Logout" : "Login" }}
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+          
+          <NavigationMenuItem>
+            <Button variant="ghost" size="icon" @click="toggleDark()">
+              <SunIcon v-if="isDark" class="h-5 w-5" />
+              <MoonIcon v-else class="h-5 w-5" />
+              <span class="sr-only">Toggle theme</span>
+            </Button>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
     </div>
-  </v-app-bar>
+  </header>
 </template>

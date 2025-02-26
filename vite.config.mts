@@ -5,8 +5,8 @@ import Fonts from 'unplugin-fonts/vite'
 import Layouts from 'vite-plugin-vue-layouts'
 import Vue from '@vitejs/plugin-vue'
 import VueRouter from 'unplugin-vue-router/vite'
-import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-
+import autoprefixer from 'autoprefixer'
+import tailwindcss from 'tailwindcss'
 // Utilities
 import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
@@ -34,16 +34,7 @@ export default defineConfig({
     Components({
       dts: 'src/components.d.ts',
     }),
-    Vue({
-      template: { transformAssetUrls },
-    }),
-    // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
-    Vuetify({
-      autoImport: true,
-      styles: {
-        configFile: 'src/styles/settings.scss',
-      },
-    }),
+    Vue(),
     Fonts({
       google: {
         families: [ {
@@ -72,10 +63,8 @@ export default defineConfig({
     port: 3000,
   },
   css: {
-    preprocessorOptions: {
-      sass: {
-        api: 'modern-compiler',
-      },
+    postcss: {
+      plugins: [tailwindcss(), autoprefixer()],
     },
   },
 })

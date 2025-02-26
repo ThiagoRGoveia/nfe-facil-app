@@ -3,6 +3,12 @@ import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { REFRESH_CLIENT_SECRET } from '@/graphql/user';
 import type { User } from '@/graphql/generated/graphql';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
+import { Copy, Eye, EyeOff, RefreshCw, CheckCircle2 } from 'lucide-vue-next';
 
 const props = defineProps<{
   user: User;
@@ -13,6 +19,7 @@ const isRefreshing = ref(false);
 const clientId = computed(() => props.user.clientId);
 const localClientSecret = ref(props.user.clientSecret);
 const clientSecret = computed(() => localClientSecret.value);
+const showCopied = ref(false);
 
 const { mutate: refreshSecret } = useMutation<{ refreshUserClientSecret: { clientSecret: string } }>(REFRESH_CLIENT_SECRET, {
   update: (cache, { data }) => {
@@ -28,6 +35,10 @@ const toggleSecret = () => {
 
 const copyToClipboard = (text: string) => {
   window.navigator.clipboard.writeText(text);
+  showCopied.value = true;
+  setTimeout(() => {
+    showCopied.value = false;
+  }, 2000);
 };
 
 const handleRefreshSecret = async () => {
@@ -55,99 +66,95 @@ const maskedSecret = (secret: string) => {
 </script>
 
 <template>
-  <v-form>
-    <v-card
-      class="pa-4"
-      elevation="0"
-    >
-      <v-row>
-        <v-col
-          cols="12"
-          sm="8"
-          md="8"
-        >
-          <v-text-field
-            :model-value="clientId"
-            label="Client ID"
-            readonly
-            variant="outlined"
-            density="comfortable"
-            hide-details
-            class="mb-4"
-          >
-            <template #append-inner>
-              <v-btn
-                icon
-                variant="text"
-                @click="() => copyToClipboard(clientId)"
-              >
-                <v-icon>mdi-content-copy</v-icon>
-              </v-btn>
-            </template>
-          </v-text-field>
-        </v-col>
-
-        <v-col
-          cols="12"
-          sm="8"
-          md="8"
-        >
-          <v-text-field
-            :model-value="showSecret ? clientSecret : maskedSecret(clientSecret)"
-            label="Client Secret"
-            readonly
-            variant="outlined"
-            density="comfortable"
-            hide-details
-            class="mb-4"
-          >
-            <template #append-inner>
-              <div class="d-flex gap-2">
-                <v-btn
-                  icon
-                  variant="text"
-                  @click="toggleSecret"
-                >
-                  <v-icon>
-                    {{ showSecret ? 'mdi-eye-off' : 'mdi-eye' }}
-                  </v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  variant="text"
-                  :disabled="!showSecret"
-                  @click="() => showSecret && copyToClipboard(clientSecret)"
-                >
-                  <v-icon>mdi-content-copy</v-icon>
-                </v-btn>
-              </div>
-            </template>
-          </v-text-field>
-        </v-col>
-
-        <v-col
-          cols="12"
-          sm="8"
-          md="8"
-        >
-          <v-btn
-            :loading="isRefreshing"
+  <Form class="w-full">
+    <Card>
+      <CardContent class="pt-6">
+        <div class="space-y-4">
+          <FormField name="clientId">
+            <FormItem>
+              <FormLabel for="client-id">Client ID</FormLabel>
+              <FormControl>
+                <div class="relative">
+                  <Input
+                    id="client-id"
+                    :value="clientId"
+                    readonly
+                    class="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    class="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
+                    @click="() => copyToClipboard(clientId)"
+                  >
+                    <CheckCircle2 v-if="showCopied" class="h-4 w-4 text-green-500" />
+                    <Copy v-else class="h-4 w-4" />
+                  </Button>
+                </div>
+              </FormControl>
+            </FormItem>
+          </FormField>
+          
+          <FormField name="clientSecret">
+            <FormItem>
+              <FormLabel for="client-secret">Client Secret</FormLabel>
+              <FormControl>
+                <div class="relative">
+                  <Input
+                    id="client-secret"
+                    :value="showSecret ? clientSecret : maskedSecret(clientSecret)"
+                    readonly
+                    class="pr-20"
+                  />
+                  <div class="absolute right-1 top-1/2 transform -translate-y-1/2 flex">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      class="h-8 w-8"
+                      @click="toggleSecret"
+                    >
+                      <EyeOff v-if="showSecret" class="h-4 w-4" />
+                      <Eye v-else class="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      class="h-8 w-8"
+                      :disabled="!showSecret"
+                      @click="() => showSecret && copyToClipboard(clientSecret)"
+                    >
+                      <CheckCircle2 v-if="showCopied" class="h-4 w-4 text-green-500" />
+                      <Copy v-else class="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </FormControl>
+              <FormDescription>
+                Your secret key for API authentication. Keep it secure.
+              </FormDescription>
+            </FormItem>
+          </FormField>
+          
+          <Button
+            type="button"
+            class="w-full mt-4"
             :disabled="isRefreshing"
-            color="primary"
-            type="submit"
-            block
-            @click.prevent="handleRefreshSecret"
+            @click="handleRefreshSecret"
           >
-            {{ isRefreshing ? 'Atualizando...' : 'Renovar Client Secret' }}
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card>
-  </v-form>
+            <RefreshCw v-if="isRefreshing" class="mr-2 h-4 w-4 animate-spin" />
+            <span>{{ isRefreshing ? 'Atualizando...' : 'Renovar Client Secret' }}</span>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  </Form>
 </template>
 
 <style scoped>
-.v-form {
+form {
   width: 100%;
   margin: 0;
 }

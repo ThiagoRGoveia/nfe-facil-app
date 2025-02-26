@@ -1,17 +1,14 @@
 <template>
-  <v-main>
+  <div class="min-h-screen flex flex-col">
     <AppNavbar />
-    <v-container>
-      <v-row justify="center">
-        <v-col
-          cols="12"
-          lg="8"
-        >
+    <main class="flex-1">
+      <div class="container mx-auto py-8">
+        <div class="max-w-4xl mx-auto">
           <router-view />
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-main>
+        </div>
+      </div>
+    </main>
+  </div>
 </template>
 
 <script lang="ts" setup>

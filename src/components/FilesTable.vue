@@ -3,6 +3,23 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useLazyQuery } from '@vue/apollo-composable';
 import { FIND_ALL_FILES } from '@/graphql/history';
 import type { FileProcessStatus, FileToProcess } from '@/graphql/generated/graphql';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  Download,
+} from 'lucide-vue-next';
 
 interface TableOptions {
   page: number;
@@ -28,11 +45,20 @@ const props = defineProps<{
   batchId: string;
 }>();
 
-const tableOptions = ref<TableOptions>({
-  page: 1,
-  itemsPerPage: 10,
-  sortBy: [{ key: 'fileName', order: 'asc' }],
-});
+// Pagination state
+const currentPage = ref(1);
+const pageSize = ref(10);
+
+// Sorting state
+const sortColumn = ref('fileName');
+const sortDirection = ref<'asc' | 'desc'>('asc');
+
+// Computed tableOptions for API call compatibility
+const tableOptions = computed<TableOptions>(() => ({
+  page: currentPage.value,
+  itemsPerPage: pageSize.value,
+  sortBy: [{ key: sortColumn.value, order: sortDirection.value }],
+}));
 
 const { load, result, loading, refetch } = useLazyQuery(FIND_ALL_FILES, () => ({
   pagination: {
@@ -49,58 +75,70 @@ const { load, result, loading, refetch } = useLazyQuery(FIND_ALL_FILES, () => ({
   },
   sort: tableOptions.value.sortBy[0] ? {
     field: tableOptions.value.sortBy[0].key,
-        direction: tableOptions.value.sortBy[0].order.toUpperCase(),
-      } : undefined,
-    }),
-    {
-      debounce: 1000,
-      keepPreviousResult: true,
-      fetchPolicy: 'cache-first'
-    }
-  );
+    direction: tableOptions.value.sortBy[0].order.toUpperCase(),
+  } : undefined,
+}),
+{
+  debounce: 1000,
+  keepPreviousResult: true,
+  fetchPolicy: 'cache-first'
+});
 
 const files = computed<FileItem[]>(() => {
   return (result.value?.findAllFiles.items ?? []) as FileItem[];
 });
 
 const totalItems = computed(() => result.value?.findAllFiles.total ?? 0);
+const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value));
 
-watch(tableOptions, (args) => {
-  console.log('args', args, tableOptions.value);
-  if (tableOptions.value.page !== args.page || tableOptions.value.itemsPerPage !== args.itemsPerPage) {
-    console.log('refetching');
-    refetch();
-  }
-});
+watch(tableOptions, () => {
+  refetch();
+}, { deep: true });
 
-const headers = [
+const columns = [
   {
     title: "File Name",
     key: "fileName",
-    align: "start" as const,
     sortable: true,
   },
   {
     title: "Download",
     key: "download",
-    align: "center" as const,
     sortable: false,
   },
   {
     title: "Results",
     key: "results",
-    align: "start" as const,
     sortable: false,
   },
   {
     title: "Status",
     key: "status",
-    align: "center" as const,
     sortable: true,
   },
 ];
 
+const getBadgeVariant = (status: FileProcessStatus) => {
+  switch(status) {
+    case 'COMPLETED': return 'secondary';
+    case 'FAILED': return 'destructive';
+    default: return 'default';
+  }
+};
 
+const getSortIcon = (columnKey: string) => {
+  if (sortColumn.value !== columnKey) return ChevronsUpDown;
+  return sortDirection.value === 'asc' ? ChevronUp : ChevronDown;
+};
+
+const toggleSort = (columnKey: string) => {
+  if (sortColumn.value === columnKey) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortColumn.value = columnKey;
+    sortDirection.value = 'asc';
+  }
+};
 
 const handleDownload = (event: Event, item: FileItem) => {
   event.stopPropagation();
@@ -108,70 +146,152 @@ const handleDownload = (event: Event, item: FileItem) => {
   console.log("Downloading file:", item.fileName);
 };
 
-const handleTableOptionsUpdate = (options: TableOptions) => {
-  tableOptions.value = options;
+const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return;
+  currentPage.value = page;
 };
 
 onMounted(() => {
   load();
 });
-
 </script>
 
 <template>
-  <v-data-table-server
-    :headers="headers"
-    :items="files"
-    :loading="loading"
-    :items-per-page="tableOptions.itemsPerPage"
-    :page="tableOptions.page"
-    :items-length="totalItems"
-    hover
-    @update:options="handleTableOptionsUpdate"
-  >
-    <template #item.download="{ item }">
-      <v-tooltip
-        activator="parent"
-        location="top"
-        text="Download file"
-      >
-        <template #activator>
-          <v-btn
-            density="comfortable"
-            icon="mdi-download-circle-outline"
-            size="small"
-            color="primary"
-            v-bind="props"
-            @click="(event: Event) => handleDownload(event, item as FileItem)"
-          />
-        </template>
-      </v-tooltip>
-    </template>
+  <div>
+    <Table>
+      <TableCaption v-if="files.length === 0 && !loading">
+        No files found
+      </TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead v-for="column in columns" :key="column.key" :class="{ 'cursor-pointer': column.sortable }" @click="column.sortable && toggleSort(column.key)">
+            <div class="flex items-center gap-1">
+              {{ column.title }}
+              <component :is="getSortIcon(column.key)" v-if="column.sortable" class="h-4 w-4" />
+            </div>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow v-if="loading" class="h-24">
+          <TableCell :colspan="columns.length" class="text-center">
+            Loading...
+          </TableCell>
+        </TableRow>
+        <TableRow 
+          v-for="item in files" 
+          :key="item.id"
+          class="hover:bg-muted/50"
+        >
+          <TableCell>{{ item.fileName }}</TableCell>
+          <TableCell class="text-center">
+            <Button 
+              variant="outline" 
+              size="icon"
+              @click="(event) => handleDownload(event, item)"
+              title="Download file"
+            >
+              <Download class="h-4 w-4" />
+            </Button>
+          </TableCell>
+          <TableCell>
+            <span
+              v-if="item.error"
+              class="text-destructive"
+            >{{ item.error }}</span>
+            <span v-else-if="item.result">{{ JSON.stringify(item.result) }}</span>
+            <span v-else>-</span>
+          </TableCell>
+          <TableCell class="text-center">
+            <Badge :variant="getBadgeVariant(item.status)">
+              {{ item.status }}
+            </Badge>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
 
-    <template #item.results="{ item }">
-      <span
-        v-if="(item as FileItem).error"
-        class="text-error"
-      >{{ (item as FileItem).error }}</span>
-      <span v-else-if="(item as FileItem).result">{{ JSON.stringify((item as FileItem).result) }}</span>
-      <span v-else>-</span>
-    </template>
-
-    <template #item.status="{ item }">
-      <v-chip
-        :color="(item as FileItem).status === 'COMPLETED' ?
-         'success' : (item as FileItem).status === 'FAILED' ? 
-         'error' : 'warning'"
-        size="small"
-      >
-        {{ (item as FileItem).status }}
-      </v-chip>
-    </template>
-  </v-data-table-server>
+    <div class="flex items-center justify-between space-x-2 py-4">
+      <div class="flex-1 text-sm text-muted-foreground">
+        Showing {{ files.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} to 
+        {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+      </div>
+      <div v-if="totalPages > 1" class="flex items-center gap-1">
+        <Button 
+          variant="outline" 
+          size="sm"
+          :disabled="currentPage === 1"
+          @click="goToPage(currentPage - 1)"
+        >
+          Previous
+        </Button>
+        
+        <div v-if="totalPages <= 5">
+          <Button 
+            v-for="page in totalPages" 
+            :key="page"
+            size="sm"
+            :variant="currentPage === page ? 'default' : 'outline'"
+            @click="goToPage(page)"
+          >
+            {{ page }}
+          </Button>
+        </div>
+        
+        <div v-else>
+          <!-- First page always visible -->
+          <Button 
+            size="sm"
+            :variant="currentPage === 1 ? 'default' : 'outline'"
+            @click="goToPage(1)"
+          >
+            1
+          </Button>
+          
+          <!-- Ellipsis if needed -->
+          <span v-if="currentPage > 3" class="mx-1">...</span>
+          
+          <!-- Pages around current -->
+          <template v-for="(page, index) in [
+            Math.max(2, currentPage - 1), 
+            currentPage !== 1 && currentPage !== totalPages ? currentPage : null, 
+            Math.min(totalPages - 1, currentPage + 1)
+          ]" :key="index">
+            <Button 
+              v-if="page !== null"
+              size="sm"
+              :variant="currentPage === page ? 'default' : 'outline'"
+              @click="goToPage(page)"
+            >
+              {{ page }}
+            </Button>
+          </template>
+          
+          <!-- Ellipsis if needed -->
+          <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
+          
+          <!-- Last page always visible -->
+          <Button 
+            size="sm"
+            :variant="currentPage === totalPages ? 'default' : 'outline'"
+            @click="goToPage(totalPages)"
+          >
+            {{ totalPages }}
+          </Button>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          size="sm"
+          :disabled="currentPage === totalPages"
+          @click="goToPage(currentPage + 1)"
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-.v-data-table ::v-deep tbody tr {
-  cursor: pointer;
-}
 </style>

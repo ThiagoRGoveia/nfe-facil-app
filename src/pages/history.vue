@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface BatchProcess {
   id: string;
@@ -22,20 +23,20 @@ const handleRowClick = (item: BatchProcess) => {
       <h1 class="text-2xl font-bold">
         Processing History
       </h1>
-      <p class="text-gray-600">
+      <p class="text-muted-foreground">
         View and manage your file processing history
       </p>
     </div>
 
-    <v-row>
-      <v-col :cols="12">
-        <v-card>
-          <v-card-title>Processing History</v-card-title>
-          <v-card-text>
-            <HistoryTable @row-click="handleRowClick" />
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+    <div class="grid grid-cols-1 gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Processing History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <HistoryTable @row-click="handleRowClick" />
+        </CardContent>
+      </Card>
+    </div>
   </div>
 </template> 

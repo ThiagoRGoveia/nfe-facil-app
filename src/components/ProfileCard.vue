@@ -1,82 +1,62 @@
 <script setup lang="ts">
 import type { User } from '@/graphql/generated/graphql';
-
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { computed } from 'vue';
+import { Mail, LogIn, Star, DollarSign } from 'lucide-vue-next';
 
 const props = defineProps<{
   user: User;
 }>();
 
 const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
-
 </script>
 
 <template>
-  <v-card elevation="2">
-    <v-card-title class="text-h5">
+  <Card>
+    <CardTitle class="p-6 text-xl">
       Olá {{ fullName }}
-    </v-card-title>
+    </CardTitle>
 
-    <v-card-text>
-      <v-list>
-        <v-list-item>
-          <template #prepend>
-            <v-icon
-              color="primary"
-              class="mr-3"
-            >
-              mdi-email
-            </v-icon>
-          </template>
-          <v-list-item-title>Email</v-list-item-title>
-          <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
-        </v-list-item>
+    <CardContent>
+      <ul class="space-y-4">
+        <li class="flex items-start">
+          <Mail class="h-5 w-5 text-primary mr-3 mt-0.5" />
+          <div>
+            <div class="font-medium">Email</div>
+            <div class="text-sm text-muted-foreground">{{ user.email }}</div>
+          </div>
+        </li>
 
-        <v-list-item>
-          <template #prepend>
-            <v-icon
-              color="primary"
-              class="mr-3"
-            >
-              mdi-login
-            </v-icon>
-          </template>
-          <v-list-item-title>Sign-up Method</v-list-item-title>
-          <v-list-item-subtitle>{{ user.isSocial ? 'Social' : 'Email' }}</v-list-item-subtitle>
-        </v-list-item>
+        <li class="flex items-start">
+          <LogIn class="h-5 w-5 text-primary mr-3 mt-0.5" />
+          <div>
+            <div class="font-medium">Sign-up Method</div>
+            <div class="text-sm text-muted-foreground">{{ user.isSocial ? 'Social' : 'Email' }}</div>
+          </div>
+        </li>
 
-        <v-list-item>
-          <template #prepend>
-            <v-icon
-              color="primary"
-              class="mr-3"
-            >
-              mdi-star
-            </v-icon>
-          </template>
-          <v-list-item-title>Plano</v-list-item-title>
-        </v-list-item>
+        <li class="flex items-start">
+          <Star class="h-5 w-5 text-primary mr-3 mt-0.5" />
+          <div>
+            <div class="font-medium">Plano</div>
+          </div>
+        </li>
 
-        <v-list-item>
-          <template #prepend>
-            <v-icon
-              color="primary"
-              class="mr-3"
-            >
-              mdi-currency-usd
-            </v-icon>
-          </template>
-          <v-list-item-title>Créditos Disponíveis</v-list-item-title>
-          <v-list-item-subtitle>
-            <v-chip
-              :color="user.credits > 0 ? 'success' : 'error'"
-              size="small"
-              class="mt-1"
+        <li class="flex items-start">
+          <DollarSign class="h-5 w-5 text-primary mr-3 mt-0.5" />
+          <div>
+            <div class="font-medium">Créditos Disponíveis</div>
+            <Badge 
+              class="mt-1" 
+              :variant="user.credits > 0 ? 'default' : 'destructive'"
+              :class="{'bg-green-500': user.credits > 0}"
             >
               {{ user.credits }} credits
-            </v-chip>
-          </v-list-item-subtitle>
-        </v-list-item>
-      </v-list>
-    </v-card-text>
-  </v-card>
+            </Badge>
+          </div>
+        </li>
+      </ul>
+    </CardContent>
+  </Card>
 </template>

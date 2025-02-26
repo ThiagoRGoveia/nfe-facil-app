@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Card, CardContent, CardTitle, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-vue-next";
 
 interface ProductFeature {
   name: string;
@@ -9,7 +12,7 @@ interface ProductFeature {
 interface Product {
   name: string;
   description: string;
-  price: string; // Added price field
+  price: string;
   features: ProductFeature[];
 }
 
@@ -21,86 +24,78 @@ defineProps<{
 
 <template>
   <div class="pricing-table">
-    <v-container>
-      <v-row>
-        <v-col
-          v-for="(product, index) in products"
-          :key="index"
-          cols="12"
-          md="4"
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div
+        v-for="(product, index) in products"
+        :key="index"
+        class="flex flex-col"
+      >
+        <Card
+          class="pricing-card flex-1 flex flex-col"
+          :class="{ 'primary-plan': index === 1 }"
         >
-          <v-card
-            class="pricing-card"
-            elevation="2"
-            :class="{ 'primary-plan': index === 1 }"
-          >
-            <v-card-title class="text-center text-h5 pt-6 font-weight-bold">
-              {{ product.name }}
-            </v-card-title>
-            <v-card-text>
-              <div class="text-center mb-4">
-                <div class="text-h4 font-weight-bold">
-                  {{ product.price }}
-                </div>
-                <div class="text-body-2 text-medium-emphasis">
-                  {{ product.description }}
-                </div>
+          <CardTitle class="text-center p-6 text-xl font-bold">
+            {{ product.name }}
+          </CardTitle>
+          <CardContent class="flex-1 flex flex-col">
+            <div class="text-center mb-4">
+              <div class="text-2xl font-bold">
+                {{ product.price }}
               </div>
+              <div class="text-sm text-muted-foreground">
+                {{ product.description }}
+              </div>
+            </div>
 
-              <v-divider class="mb-4" />
+            <div class="border-t my-4" />
 
-              <v-list density="compact">
-                <v-list-item
-                  v-for="(feature, fIdx) in product.features"
-                  :key="fIdx"
-                  class="px-2"
-                >
-                  <template #prepend>
-                    <v-icon
-                      :color="feature.included ? 'success' : 'error'"
-                      size="small"
-                    >
-                      {{
-                        feature.included
-                          ? "mdi-check-circle"
-                          : "mdi-close-circle"
-                      }}
-                    </v-icon>
-                  </template>
-                  <v-list-item-title class="text-body-2">
+            <ul class="space-y-2 flex-1">
+              <li
+                v-for="(feature, fIdx) in product.features"
+                :key="fIdx"
+                class="flex items-start py-1"
+              >
+                <div class="mr-2 mt-0.5">
+                  <Check
+                    v-if="feature.included"
+                    class="h-4 w-4 text-success"
+                  />
+                  <X
+                    v-else
+                    class="h-4 w-4 text-destructive"
+                  />
+                </div>
+                <div>
+                  <div class="text-sm font-medium">
                     {{ feature.name }}
-                  </v-list-item-title>
-                  <v-list-item-subtitle
+                  </div>
+                  <div
                     v-if="feature.condition"
-                    class="text-caption"
+                    class="text-xs text-muted-foreground"
                   >
                     {{ feature.condition }}
-                  </v-list-item-subtitle>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-            <v-card-actions class="pb-6">
-              <v-btn
-                block
-                :color="index === 1 ? 'primary' : 'default'"
-                :variant="index === 1 ? 'elevated' : 'outlined'"
-                class="mx-4"
-              >
-                {{ ctaText || "Choose Plan" }}
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </CardContent>
+          <CardFooter class="p-6">
+            <Button
+              class="w-full"
+              :variant="index === 1 ? 'default' : 'outline'"
+            >
+              {{ ctaText || "Choose Plan" }}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .pricing-card {
   height: 100%;
-  display: flex;
-  flex-direction: column;
   transition: transform 0.2s;
 }
 
@@ -109,10 +104,6 @@ defineProps<{
 }
 
 .primary-plan {
-  border: 2px solid rgb(var(--v-theme-primary));
-}
-
-.v-list-item {
-  min-height: 40px;
+  border: 2px solid hsl(var(--primary));
 }
 </style>

@@ -3,6 +3,15 @@ import { ref } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { PROCESS_BATCH_SYNC } from "@/graphql/private";
 import ConversionForm from "./ConversionForm.vue";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  FileJson,
+  FileSpreadsheet,
+  FileText,
+  Loader2,
+  AlertCircle
+} from "lucide-vue-next";
 
 interface DownloadLinks {
   json?: string | null;
@@ -63,88 +72,73 @@ const handleSubmit = async (data: { files: File[]; formats: string[] }) => {
 </script>
 
 <template>
-  <div class="h-full">
+  <div class="h-full relative">
     <ConversionForm
       title="Conversão Privada de Arquivos"
       @submit="handleSubmit"
     />
 
-    <v-alert
+    <div
       v-if="error"
-      type="error"
+      class="mt-4 p-4 border border-destructive text-destructive rounded-md flex items-start gap-2"
+    >
+      <AlertCircle class="h-5 w-5 flex-shrink-0 mt-0.5" />
+      <div>
+        <div class="font-medium">Error</div>
+        <div class="text-sm">{{ error }}</div>
+      </div>
+    </div>
+
+    <div
+      v-if="Object.keys(downloadLinks).length > 0"
       class="mt-4"
     >
-      {{ error }}
-    </v-alert>
-
-    <v-container
-      v-if="Object.keys(downloadLinks).length > 0"
-      class="px-0 mt-4"
-    >
-      <v-label class="text-subtitle-1 mb-2">
+      <Label class="text-base font-medium block mb-2">
         Download Converted Files
-      </v-label>
-      <v-row>
-        <v-col
+      </Label>
+      <div class="flex flex-wrap gap-2">
+        <Button
           v-if="downloadLinks.json"
-          cols="auto"
+          variant="outline"
+          @click="downloadFile(downloadLinks.json!, 'json')"
+          class="flex items-center"
         >
-          <v-btn
-            color="primary"
-            variant="outlined"
-            class="mr-2"
-            @click="downloadFile(downloadLinks.json!, 'json')"
-          >
-            <v-icon start>
-              mdi-code-json
-            </v-icon>
-            JSON
-          </v-btn>
-        </v-col>
-        <v-col
+          <FileJson class="mr-2 h-4 w-4" />
+          JSON
+        </Button>
+        
+        <Button
           v-if="downloadLinks.csv"
-          cols="auto"
+          variant="outline"
+          @click="downloadFile(downloadLinks.csv!, 'csv')"
+          class="flex items-center"
         >
-          <v-btn
-            color="primary"
-            variant="outlined"
-            class="mr-2"
-            @click="downloadFile(downloadLinks.csv!, 'csv')"
-          >
-            <v-icon start>
-              mdi-file-delimited
-            </v-icon>
-            CSV
-          </v-btn>
-        </v-col>
-        <v-col
+          <FileText class="mr-2 h-4 w-4" />
+          CSV
+        </Button>
+        
+        <Button
           v-if="downloadLinks.excel"
-          cols="auto"
+          variant="outline"
+          @click="downloadFile(downloadLinks.excel!, 'xlsx')"
+          class="flex items-center"
         >
-          <v-btn
-            color="primary"
-            variant="outlined"
-            @click="downloadFile(downloadLinks.excel!, 'xlsx')"
-          >
-            <v-icon start>
-              mdi-microsoft-excel
-            </v-icon>
-            Excel
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
+          <FileSpreadsheet class="mr-2 h-4 w-4" />
+          Excel
+        </Button>
+      </div>
+    </div>
 
-    <v-overlay
-      :model-value="loading"
-      class="align-center justify-center"
+    <!-- Loading overlay -->
+    <div 
+      v-if="loading" 
+      class="absolute inset-0 bg-background/80 flex items-center justify-center"
     >
-      <v-progress-circular
-        color="primary"
-        indeterminate
-        size="64"
-      />
-    </v-overlay>
+      <div class="flex flex-col items-center gap-2">
+        <Loader2 class="h-8 w-8 animate-spin text-primary" />
+        <span class="text-sm">Processing files...</span>
+      </div>
+    </div>
   </div>
 </template>
 
