@@ -3,10 +3,10 @@ import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_USER_PASSWORD } from "@/graphql/user";
 import { useAuthStore } from "@/stores/auth";
 import { computed, ref, reactive, watch } from "vue";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PasswordInput from "./PasswordInput.vue";
-import { Form } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 
 const auth = useAuthStore();
 const userId = computed(() => auth.user?.id);
@@ -30,7 +30,7 @@ watch([() => form.password, () => form.confirmPassword], ([password, confirmPass
   
   errors.confirmPassword = !confirmPassword ? "Confirmation is required" : 
                            confirmPassword !== password ? "Passwords must match" : "";
-  
+
   isValid.value = !errors.password && !errors.confirmPassword && 
                   !!password && !!confirmPassword;
 }, { immediate: true });
@@ -63,61 +63,57 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <Form class="w-full" @submit.prevent="handleSubmit">
-    <Card class="p-6">
-      <div class="grid gap-6 md:grid-cols-8">
-        <div class="md:col-span-6">
-          <div class="space-y-2">
-            <label 
-              for="password" 
-              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Nova Senha
-            </label>
-            <PasswordInput
-              id="password"
-              v-model="form.password"
-              required
-              hint="A senha deve conter pelo menos 8 caracteres"
-            />
-            <p v-if="errors.password" class="text-sm font-medium text-destructive">
-              {{ errors.password }}
-            </p>
-          </div>
-        </div>
-        
-        <div class="md:col-span-6">
-          <div class="space-y-2">
-            <label 
-              for="confirmPassword" 
-              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Confirmar Nova Senha
-            </label>
-            <PasswordInput
-              id="confirmPassword"
-              v-model="form.confirmPassword"
-              required
-            />
-            <p v-if="errors.confirmPassword" class="text-sm font-medium text-destructive">
-              {{ errors.confirmPassword }}
-            </p>
-          </div>
-        </div>
-        
-        <div class="md:col-span-6">
+  <Form
+    class="w-full"
+    @submit.prevent="handleSubmit"
+  >
+    <Card class="shadow-none border-0">
+      <CardContent class="pt-6">
+        <div class="space-y-4">
+          <FormField name="password">
+            <FormItem>
+              <FormLabel>Nova Senha</FormLabel>
+              <FormControl>
+                <PasswordInput
+                  id="password"
+                  v-model="form.password"
+                  required
+                  hint="A senha deve conter pelo menos 8 caracteres"
+                />
+              </FormControl>
+              <FormMessage>{{ errors.password }}</FormMessage>
+            </FormItem>
+          </FormField>
+
+          <FormField name="confirmPassword">
+            <FormItem>
+              <FormLabel>Confirmar Nova Senha</FormLabel>
+              <FormControl>
+                <PasswordInput
+                  id="confirmPassword"
+                  v-model="form.confirmPassword"
+                  required
+                />
+              </FormControl>
+              <FormMessage>{{ errors.confirmPassword }}</FormMessage>
+            </FormItem>
+          </FormField>
+
           <Button
             type="submit"
             class="w-full"
             :disabled="!isValid"
           >
-            <span v-if="loading" class="mr-2">
-              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em]"></span>
+            <span
+              v-if="loading"
+              class="mr-2"
+            >
+              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em]" />
             </span>
-            Atualizar Senha
+            {{ loading ? 'Atualizando...' : 'Atualizar Senha' }}
           </Button>
         </div>
-      </div>
+      </CardContent>
     </Card>
   </Form>
 </template>

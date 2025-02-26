@@ -7,6 +7,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Alert: typeof import('./components/ui/alert/Alert.vue')['default']
+    AlertDescription: typeof import('./components/ui/alert/AlertDescription.vue')['default']
+    AlertTitle: typeof import('./components/ui/alert/AlertTitle.vue')['default']
     ApiCredentials: typeof import('./components/ApiCredentials.vue')['default']
     AppNavbar: typeof import('./components/AppNavbar.vue')['default']
     Badge: typeof import('./components/ui/badge/Badge.vue')['default']
@@ -75,6 +78,7 @@ declare module 'vue' {
     ResetPassword: typeof import('./components/ResetPassword.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Separator: typeof import('./components/ui/separator/Separator.vue')['default']
     Sheet: typeof import('./components/ui/sheet/Sheet.vue')['default']
     SheetClose: typeof import('./components/ui/sheet/SheetClose.vue')['default']
     SheetContent: typeof import('./components/ui/sheet/SheetContent.vue')['default']
@@ -84,6 +88,7 @@ declare module 'vue' {
     SheetTitle: typeof import('./components/ui/sheet/SheetTitle.vue')['default']
     SheetTrigger: typeof import('./components/ui/sheet/SheetTrigger.vue')['default']
     SignupForm: typeof import('./components/SignupForm.vue')['default']
+    Skeleton: typeof import('./components/ui/skeleton/Skeleton.vue')['default']
     Table: typeof import('./components/ui/table/Table.vue')['default']
     TableBody: typeof import('./components/ui/table/TableBody.vue')['default']
     TableCaption: typeof import('./components/ui/table/TableCaption.vue')['default']

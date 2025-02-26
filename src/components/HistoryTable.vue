@@ -96,17 +96,17 @@ const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value));
 
 const columns = [
   {
-    title: "Date",
+    title: "Data",
     key: "createdAt",
     sortable: true,
   },
   {
-    title: "Number of Files",
+    title: "Número de Arquivos",
     key: "totalFiles",
     sortable: true,
   },
   {
-    title: "Processed Files",
+    title: "Arquivos Processados",
     key: "processedFiles",
     sortable: true,
   },
@@ -180,29 +180,44 @@ const emit = defineEmits<{
   <div>
     <Table>
       <TableCaption v-if="items.length === 0 && !loading">
-        No history items found
+        Nenhum item encontrado
       </TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead v-for="column in columns" :key="column.key" :class="{ 'cursor-pointer': column.sortable }" @click="column.sortable && toggleSort(column.key)">
+          <TableHead
+            v-for="column in columns"
+            :key="column.key"
+            :class="{ 'cursor-pointer': column.sortable }"
+            @click="column.sortable && toggleSort(column.key)"
+          >
             <div class="flex items-center gap-1">
               {{ column.title }}
-              <component :is="getSortIcon(column.key)" v-if="column.sortable" class="h-4 w-4" />
+              <component
+                :is="getSortIcon(column.key)"
+                v-if="column.sortable"
+                class="h-4 w-4"
+              />
             </div>
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-if="loading" class="h-24">
-          <TableCell :colspan="columns.length" class="text-center">
-            Loading...
+        <TableRow
+          v-if="loading"
+          class="h-24"
+        >
+          <TableCell
+            :colspan="columns.length"
+            class="text-center"
+          >
+            Carregando...
           </TableCell>
         </TableRow>
         <TableRow 
           v-for="item in items" 
           :key="item.id" 
-          @click="handleRowClick(item)"
           class="cursor-pointer hover:bg-muted/50"
+          @click="handleRowClick(item)"
         >
           <TableCell>{{ formatDate(item.createdAt) }}</TableCell>
           <TableCell>{{ item.totalFiles }}</TableCell>
@@ -218,17 +233,20 @@ const emit = defineEmits<{
 
     <div class="flex items-center justify-between space-x-2 py-4">
       <div class="flex-1 text-sm text-muted-foreground">
-        Showing {{ items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} to 
-        {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+        Mostrando {{ items.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} até 
+        {{ Math.min(currentPage * pageSize, totalItems) }} de {{ totalItems }} entradas
       </div>
-      <div v-if="totalPages > 1" class="flex items-center gap-1">
+      <div
+        v-if="totalPages > 1"
+        class="flex items-center gap-1"
+      >
         <Button 
           variant="outline" 
           size="sm"
           :disabled="currentPage === 1"
           @click="goToPage(currentPage - 1)"
         >
-          Previous
+          Anterior
         </Button>
         
         <div v-if="totalPages <= 5">
@@ -254,14 +272,20 @@ const emit = defineEmits<{
           </Button>
           
           <!-- Ellipsis if needed -->
-          <span v-if="currentPage > 3" class="mx-1">...</span>
+          <span
+            v-if="currentPage > 3"
+            class="mx-1"
+          >...</span>
           
           <!-- Pages around current -->
-          <template v-for="(page, index) in [
-            Math.max(2, currentPage - 1), 
-            currentPage !== 1 && currentPage !== totalPages ? currentPage : null, 
-            Math.min(totalPages - 1, currentPage + 1)
-          ]" :key="index">
+          <template
+            v-for="(page, index) in [
+              Math.max(2, currentPage - 1), 
+              currentPage !== 1 && currentPage !== totalPages ? currentPage : null, 
+              Math.min(totalPages - 1, currentPage + 1)
+            ]"
+            :key="index"
+          >
             <Button 
               v-if="page !== null"
               size="sm"
@@ -273,7 +297,10 @@ const emit = defineEmits<{
           </template>
           
           <!-- Ellipsis if needed -->
-          <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
+          <span
+            v-if="currentPage < totalPages - 2"
+            class="mx-1"
+          >...</span>
           
           <!-- Last page always visible -->
           <Button 
@@ -291,7 +318,7 @@ const emit = defineEmits<{
           :disabled="currentPage === totalPages"
           @click="goToPage(currentPage + 1)"
         >
-          Next
+          Próximo
         </Button>
       </div>
     </div>
@@ -299,15 +326,7 @@ const emit = defineEmits<{
     <Dialog v-model:open="showDialog">
       <DialogContent class="sm:max-w-[1200px]">
         <DialogHeader>
-          <DialogTitle>Files for Process {{ selectedItem?.id }}</DialogTitle>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            @click="showDialog = false"
-            class="absolute right-4 top-4"
-          >
-            <XIcon class="h-4 w-4" />
-          </Button>
+          <DialogTitle>Arquivos processados</DialogTitle>
         </DialogHeader>
         <FilesTable
           v-if="selectedItem"

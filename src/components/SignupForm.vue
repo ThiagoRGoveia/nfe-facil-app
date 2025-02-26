@@ -1,5 +1,8 @@
 <template>
-  <Form class="w-full max-w-3xl mx-auto" @submit.prevent="handleSubmit">
+  <Form
+    class="w-full max-w-3xl mx-auto"
+    @submit.prevent="handleSubmit"
+  >
     <div class="grid gap-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
@@ -10,7 +13,10 @@
             type="text"
             required
           />
-          <p v-if="errors.name" class="text-sm font-medium text-destructive">
+          <p
+            v-if="errors.name"
+            class="text-sm font-medium text-destructive"
+          >
             {{ errors.name }}
           </p>
         </div>
@@ -22,7 +28,10 @@
             type="text"
             required
           />
-          <p v-if="errors.surname" class="text-sm font-medium text-destructive">
+          <p
+            v-if="errors.surname"
+            class="text-sm font-medium text-destructive"
+          >
             {{ errors.surname }}
           </p>
         </div>
@@ -36,7 +45,10 @@
           type="email"
           required
         />
-        <p v-if="errors.email" class="text-sm font-medium text-destructive">
+        <p
+          v-if="errors.email"
+          class="text-sm font-medium text-destructive"
+        >
           {{ errors.email }}
         </p>
       </div>
@@ -48,7 +60,10 @@
           required
           hint="Password must be at least 8 characters long"
         />
-        <p v-if="errors.password" class="text-sm font-medium text-destructive">
+        <p
+          v-if="errors.password"
+          class="text-sm font-medium text-destructive"
+        >
           {{ errors.password }}
         </p>
       </div>
@@ -58,8 +73,11 @@
         class="w-full"
         :disabled="!isValid"
       >
-        <span v-if="loading" class="mr-2">
-          <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em]"></span>
+        <span
+          v-if="loading"
+          class="mr-2"
+        >
+          <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em]" />
         </span>
         Sign Up
       </Button>

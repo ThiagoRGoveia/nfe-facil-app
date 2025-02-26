@@ -98,11 +98,13 @@ const filesCount = computed(() => files.value.length);
 
 const dropZoneText = computed(() => {
   if (!hasFiles.value) {
-    return "Drop files here or click to upload";
+    return "Arraste e solte ou clique para fazer upload";
   }
-  return `${filesCount.value} file${
+  return `${filesCount.value} arquivo${
     filesCount.value === 1 ? "" : "s"
-  } selected`;
+  } selecionado${
+    filesCount.value === 1 ? "" : "s"
+  }`;
 });
 
 const formatFileSize = (bytes: number): string => {
@@ -138,24 +140,34 @@ const formatFileSize = (bytes: number): string => {
         @change="onFilesChanged"
       />
       
-      <div v-if="!hasFiles" class="flex flex-col items-center justify-center space-y-4 py-12">
+      <div
+        v-if="!hasFiles"
+        class="flex flex-col items-center justify-center space-y-4 py-12"
+      >
         <CloudUpload class="h-12 w-12 text-primary" />
-        <div class="text-xl font-medium">{{ dropZoneText }}</div>
+        <div class="text-xl font-medium">
+          {{ dropZoneText }}
+        </div>
         <div class="text-sm text-muted-foreground">
-          Maximum of {{ maxFiles }} files ({{ accept }} only)
+          Máximo de {{ maxFiles }} arquivos (apenas {{ accept }})
         </div>
         <Button 
           variant="outline" 
           type="button" 
           @click="triggerFileInput"
         >
-          Select Files
+          Selecionar Arquivos
         </Button>
       </div>
       
-      <div v-else class="space-y-4">
+      <div
+        v-else
+        class="space-y-4"
+      >
         <div class="flex items-center justify-between mb-4">
-          <div class="text-xl font-medium">{{ dropZoneText }}</div>
+          <div class="text-xl font-medium">
+            {{ dropZoneText }}
+          </div>
           <div class="flex space-x-2">
             <Button 
               variant="outline" 
@@ -163,7 +175,7 @@ const formatFileSize = (bytes: number): string => {
               type="button" 
               @click="triggerFileInput"
             >
-              Add More
+              Adicionar Mais
             </Button>
             <Button 
               variant="outline" 
@@ -171,7 +183,7 @@ const formatFileSize = (bytes: number): string => {
               type="button" 
               @click="clearFiles"
             >
-              Clear All
+              Limpar Tudo
             </Button>
           </div>
         </div>
@@ -182,7 +194,10 @@ const formatFileSize = (bytes: number): string => {
             :key="index"
             class="flex items-center gap-2 bg-muted/30 rounded-md p-2"
           >
-            <Badge variant="outline" class="text-xs truncate max-w-[200px]">
+            <Badge
+              variant="outline"
+              class="text-xs truncate max-w-[200px]"
+            >
               {{ file.name }}
             </Badge>
             <span class="text-xs text-muted-foreground">

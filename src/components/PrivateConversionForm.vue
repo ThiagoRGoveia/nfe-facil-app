@@ -84,8 +84,12 @@ const handleSubmit = async (data: { files: File[]; formats: string[] }) => {
     >
       <AlertCircle class="h-5 w-5 flex-shrink-0 mt-0.5" />
       <div>
-        <div class="font-medium">Error</div>
-        <div class="text-sm">{{ error }}</div>
+        <div class="font-medium">
+          Error
+        </div>
+        <div class="text-sm">
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -100,8 +104,8 @@ const handleSubmit = async (data: { files: File[]; formats: string[] }) => {
         <Button
           v-if="downloadLinks.json"
           variant="outline"
-          @click="downloadFile(downloadLinks.json!, 'json')"
           class="flex items-center"
+          @click="downloadFile(downloadLinks.json!, 'json')"
         >
           <FileJson class="mr-2 h-4 w-4" />
           JSON
@@ -110,8 +114,8 @@ const handleSubmit = async (data: { files: File[]; formats: string[] }) => {
         <Button
           v-if="downloadLinks.csv"
           variant="outline"
-          @click="downloadFile(downloadLinks.csv!, 'csv')"
           class="flex items-center"
+          @click="downloadFile(downloadLinks.csv!, 'csv')"
         >
           <FileText class="mr-2 h-4 w-4" />
           CSV
@@ -120,8 +124,8 @@ const handleSubmit = async (data: { files: File[]; formats: string[] }) => {
         <Button
           v-if="downloadLinks.excel"
           variant="outline"
-          @click="downloadFile(downloadLinks.excel!, 'xlsx')"
           class="flex items-center"
+          @click="downloadFile(downloadLinks.excel!, 'xlsx')"
         >
           <FileSpreadsheet class="mr-2 h-4 w-4" />
           Excel

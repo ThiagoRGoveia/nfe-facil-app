@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import { useDark, useToggle } from "@vueuse/core";
+import { useColorMode } from "@vueuse/core";
 import { useRouter } from "vue-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,8 +18,11 @@ import {
 } from "@/components/ui/sheet";
 import { MoonIcon, SunIcon, MenuIcon } from "lucide-vue-next";
 
-const isDark = useDark();
-const toggleDark = useToggle(isDark);
+const colorMode = useColorMode();
+const isDark = computed(() => colorMode.value === 'dark');
+const toggleDark = () => {
+  colorMode.value = isDark.value ? 'light' : 'dark';
+};
 const mobileMenuOpen = ref(false);
 const auth = useAuthStore();
 const router = useRouter();
@@ -40,6 +43,7 @@ const navItems = computed(() => [
   { title: "Public (TESTE)", icon: "file", to: "/public" },
   ...(isAuthenticated.value
     ? [
+        { title: "Dashboard", icon: "layout-dashboard", to: "/dashboard" },
         { title: "Histórico", icon: "history", to: "/history" },
         { title: "Perfil", icon: "user", to: "/profile" },
       ]
@@ -55,20 +59,30 @@ const navigateTo = (path: string) => {
 
 <template>
   <!-- Mobile Menu (Sheet component from shadcn) -->
-  <Sheet v-model:open="mobileMenuOpen" class="lg:hidden">
-    <SheetTrigger asChild>
-      <Button variant="ghost" size="icon" class="lg:hidden">
+  <Sheet
+    v-model:open="mobileMenuOpen"
+    class="lg:hidden"
+  >
+    <SheetTrigger as-child>
+      <Button
+        variant="ghost"
+        size="icon"
+        class="lg:hidden"
+      >
         <MenuIcon class="h-6 w-6" />
         <span class="sr-only">Toggle menu</span>
       </Button>
     </SheetTrigger>
-    <SheetContent side="left" class="w-[240px] sm:w-[300px]">
+    <SheetContent
+      side="left"
+      class="w-[240px] sm:w-[300px]"
+    >
       <nav class="flex flex-col gap-4 mt-8">
         <Button 
           v-for="item in navItems" 
           :key="item.title" 
           variant="ghost" 
-          class="w-full justify-start"
+          class="w-full justify-start cursor-pointer"
           @click="navigateTo(item.to)"
         >
           {{ item.title }}
@@ -76,7 +90,7 @@ const navigateTo = (path: string) => {
         
         <Button 
           variant="ghost" 
-          class="w-full justify-start"
+          class="w-full justify-start cursor-pointer"
           @click="handleAuth"
         >
           {{ isAuthenticated ? "Logout" : "Login" }}
@@ -84,11 +98,17 @@ const navigateTo = (path: string) => {
         
         <Button 
           variant="ghost" 
-          class="w-full justify-start"
-          @click="toggleDark()"
+          class="w-full justify-start cursor-pointer"
+          @click="toggleDark"
         >
-          <SunIcon v-if="isDark" class="h-5 w-5 mr-2" />
-          <MoonIcon v-else class="h-5 w-5 mr-2" />
+          <SunIcon
+            v-if="isDark"
+            class="h-5 w-5 mr-2"
+          />
+          <MoonIcon
+            v-else
+            class="h-5 w-5 mr-2"
+          />
           {{ isDark ? "Light" : "Dark" }}
         </Button>
       </nav>
@@ -98,14 +118,19 @@ const navigateTo = (path: string) => {
   <!-- Desktop Navigation -->
   <header class="border-b sticky top-0 z-40 w-full bg-background">
     <div class="container flex h-16 items-center px-4 sm:px-6">
-      <div class="mr-4 font-bold text-lg">NFE Fácil</div>
+      <div class="mr-4 font-bold text-lg">
+        NFE Fácil
+      </div>
       
       <!-- Desktop Navigation Menu -->
       <NavigationMenu class="hidden lg:flex ml-auto">
         <NavigationMenuList>
-          <NavigationMenuItem v-for="item in navItems" :key="item.title">
+          <NavigationMenuItem
+            v-for="item in navItems"
+            :key="item.title"
+          >
             <NavigationMenuLink 
-              :class="navigationMenuTriggerStyle()"
+              :class="[navigationMenuTriggerStyle(), 'cursor-pointer']"
               @click="navigateTo(item.to)"
             >
               {{ item.title }}
@@ -114,7 +139,7 @@ const navigateTo = (path: string) => {
           
           <NavigationMenuItem>
             <NavigationMenuLink 
-              :class="navigationMenuTriggerStyle()"
+              :class="[navigationMenuTriggerStyle(), 'cursor-pointer']"
               @click="handleAuth"
             >
               {{ isAuthenticated ? "Logout" : "Login" }}
@@ -122,9 +147,20 @@ const navigateTo = (path: string) => {
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <Button variant="ghost" size="icon" @click="toggleDark()">
-              <SunIcon v-if="isDark" class="h-5 w-5" />
-              <MoonIcon v-else class="h-5 w-5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              class="cursor-pointer"
+              @click="toggleDark"
+            >
+              <SunIcon
+                v-if="isDark"
+                class="h-5 w-5"
+              />
+              <MoonIcon
+                v-else
+                class="h-5 w-5"
+              />
               <span class="sr-only">Toggle theme</span>
             </Button>
           </NavigationMenuItem>

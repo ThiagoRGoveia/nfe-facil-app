@@ -63,8 +63,11 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <Form @submit.prevent="handleSubmit" class="h-full">
-    <Card class="h-full">
+  <Form
+    class="h-full"
+    @submit.prevent="handleSubmit"
+  >
+    <Card class="h-full shadow-none border-0">
       <CardHeader>
         <CardTitle>{{ title }}</CardTitle>
       </CardHeader>

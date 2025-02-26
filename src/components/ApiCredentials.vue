@@ -3,12 +3,8 @@ import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { REFRESH_CLIENT_SECRET } from '@/graphql/user';
 import type { User } from '@/graphql/generated/graphql';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription } from '@/components/ui/form';
 import { Copy, Eye, EyeOff, RefreshCw, CheckCircle2 } from 'lucide-vue-next';
+import { FormField } from './ui/form';
 
 const props = defineProps<{
   user: User;
@@ -19,7 +15,8 @@ const isRefreshing = ref(false);
 const clientId = computed(() => props.user.clientId);
 const localClientSecret = ref(props.user.clientSecret);
 const clientSecret = computed(() => localClientSecret.value);
-const showCopied = ref(false);
+const showCopiedClientId = ref(false);
+const showCopiedClientSecret = ref(false);
 
 const { mutate: refreshSecret } = useMutation<{ refreshUserClientSecret: { clientSecret: string } }>(REFRESH_CLIENT_SECRET, {
   update: (cache, { data }) => {
@@ -33,11 +30,19 @@ const toggleSecret = () => {
   showSecret.value = !showSecret.value;
 };
 
-const copyToClipboard = (text: string) => {
+const copyToClipboard = (text: string, type: 'clientId' | 'clientSecret') => {
   window.navigator.clipboard.writeText(text);
-  showCopied.value = true;
+  if (type === 'clientId') {
+    showCopiedClientId.value = true;
+  } else {
+    showCopiedClientSecret.value = true;
+  }
   setTimeout(() => {
-    showCopied.value = false;
+    if (type === 'clientId') {
+      showCopiedClientId.value = false;
+    } else {
+      showCopiedClientSecret.value = false;
+    }
   }, 2000);
 };
 
@@ -67,29 +72,37 @@ const maskedSecret = (secret: string) => {
 
 <template>
   <Form class="w-full">
-    <Card>
+    <Card class="shadow-none border-0">
       <CardContent class="pt-6">
         <div class="space-y-4">
           <FormField name="clientId">
             <FormItem>
-              <FormLabel for="client-id">Client ID</FormLabel>
+              <FormLabel for="client-id">
+                Client ID
+              </FormLabel>
               <FormControl>
                 <div class="relative">
                   <Input
                     id="client-id"
                     :value="clientId"
-                    readonly
                     class="pr-10"
+                    disabled
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     class="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
-                    @click="() => copyToClipboard(clientId)"
+                    @click="() => copyToClipboard(clientId, 'clientId')"
                   >
-                    <CheckCircle2 v-if="showCopied" class="h-4 w-4 text-green-500" />
-                    <Copy v-else class="h-4 w-4" />
+                    <CheckCircle2
+                      v-if="showCopiedClientId"
+                      class="h-4 w-4 text-green-500"
+                    />
+                    <Copy
+                      v-else
+                      class="h-4 w-4"
+                    />
                   </Button>
                 </div>
               </FormControl>
@@ -98,14 +111,16 @@ const maskedSecret = (secret: string) => {
           
           <FormField name="clientSecret">
             <FormItem>
-              <FormLabel for="client-secret">Client Secret</FormLabel>
+              <FormLabel for="client-secret">
+                Client Secret
+              </FormLabel>
               <FormControl>
                 <div class="relative">
                   <Input
                     id="client-secret"
                     :value="showSecret ? clientSecret : maskedSecret(clientSecret)"
-                    readonly
                     class="pr-20"
+                    disabled
                   />
                   <div class="absolute right-1 top-1/2 transform -translate-y-1/2 flex">
                     <Button
@@ -115,8 +130,14 @@ const maskedSecret = (secret: string) => {
                       class="h-8 w-8"
                       @click="toggleSecret"
                     >
-                      <EyeOff v-if="showSecret" class="h-4 w-4" />
-                      <Eye v-else class="h-4 w-4" />
+                      <EyeOff
+                        v-if="showSecret"
+                        class="h-4 w-4"
+                      />
+                      <Eye
+                        v-else
+                        class="h-4 w-4"
+                      />
                     </Button>
                     <Button
                       type="button"
@@ -124,10 +145,16 @@ const maskedSecret = (secret: string) => {
                       size="icon"
                       class="h-8 w-8"
                       :disabled="!showSecret"
-                      @click="() => showSecret && copyToClipboard(clientSecret)"
+                      @click="() => showSecret && copyToClipboard(clientSecret, 'clientSecret')"
                     >
-                      <CheckCircle2 v-if="showCopied" class="h-4 w-4 text-green-500" />
-                      <Copy v-else class="h-4 w-4" />
+                      <CheckCircle2
+                        v-if="showCopiedClientSecret"
+                        class="h-4 w-4 text-green-500"
+                      />
+                      <Copy
+                        v-else
+                        class="h-4 w-4"
+                      />
                     </Button>
                   </div>
                 </div>
@@ -144,7 +171,10 @@ const maskedSecret = (secret: string) => {
             :disabled="isRefreshing"
             @click="handleRefreshSecret"
           >
-            <RefreshCw v-if="isRefreshing" class="mr-2 h-4 w-4 animate-spin" />
+            <RefreshCw
+              v-if="isRefreshing"
+              class="mr-2 h-4 w-4 animate-spin"
+            />
             <span>{{ isRefreshing ? 'Atualizando...' : 'Renovar Client Secret' }}</span>
           </Button>
         </div>

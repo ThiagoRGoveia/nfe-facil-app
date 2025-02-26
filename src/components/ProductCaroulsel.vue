@@ -96,7 +96,7 @@ onUnmounted(() => {
                     :src="product.image" 
                     :alt="product.name"
                     class="h-full w-full object-cover rounded-t-lg"
-                  />
+                  >
                 </div>
                 
                 <CardHeader>
@@ -104,7 +104,9 @@ onUnmounted(() => {
                 </CardHeader>
                 
                 <CardContent>
-                  <p class="text-muted-foreground mb-4">{{ product.description }}</p>
+                  <p class="text-muted-foreground mb-4">
+                    {{ product.description }}
+                  </p>
                   
                   <ul class="space-y-2">
                     <li 
@@ -113,12 +115,22 @@ onUnmounted(() => {
                       class="flex items-start"
                     >
                       <div class="mr-2 mt-0.5">
-                        <Check v-if="feature.included" class="h-4 w-4 text-green-500" />
-                        <X v-else class="h-4 w-4 text-red-500" />
+                        <Check
+                          v-if="feature.included"
+                          class="h-4 w-4 text-green-500"
+                        />
+                        <X
+                          v-else
+                          class="h-4 w-4 text-red-500"
+                        />
                       </div>
                       <div>
-                        <p class="text-sm font-medium">{{ feature.name }}</p>
-                        <p class="text-xs text-muted-foreground">{{ feature.condition }}</p>
+                        <p class="text-sm font-medium">
+                          {{ feature.name }}
+                        </p>
+                        <p class="text-xs text-muted-foreground">
+                          {{ feature.condition }}
+                        </p>
                       </div>
                     </li>
                   </ul>

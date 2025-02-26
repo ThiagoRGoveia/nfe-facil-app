@@ -101,8 +101,12 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
     >
       <AlertCircle class="h-5 w-5 flex-shrink-0 mt-0.5" />
       <div>
-        <div class="font-medium">Error</div>
-        <div class="text-sm">{{ error }}</div>
+        <div class="font-medium">
+          Error
+        </div>
+        <div class="text-sm">
+          {{ error }}
+        </div>
       </div>
     </div>
 
@@ -118,13 +122,19 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
           v-if="downloadLinks.json"
           variant="outline"
           :disabled="downloadingFiles['json']"
-          @click="downloadFile(downloadLinks.json!, 'json')"
           class="flex items-center"
+          @click="downloadFile(downloadLinks.json!, 'json')"
         >
-          <div v-if="downloadingFiles['json']" class="mr-2">
+          <div
+            v-if="downloadingFiles['json']"
+            class="mr-2"
+          >
             <Loader2 class="h-4 w-4 animate-spin" />
           </div>
-          <FileJson v-else class="mr-2 h-4 w-4" />
+          <FileJson
+            v-else
+            class="mr-2 h-4 w-4"
+          />
           <span>JSON</span>
         </Button>
         
@@ -132,13 +142,19 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
           v-if="downloadLinks.csv"
           variant="outline"
           :disabled="downloadingFiles['csv']"
-          @click="downloadFile(downloadLinks.csv!, 'csv')"
           class="flex items-center"
+          @click="downloadFile(downloadLinks.csv!, 'csv')"
         >
-          <div v-if="downloadingFiles['csv']" class="mr-2">
+          <div
+            v-if="downloadingFiles['csv']"
+            class="mr-2"
+          >
             <Loader2 class="h-4 w-4 animate-spin" />
           </div>
-          <FileText v-else class="mr-2 h-4 w-4" />
+          <FileText
+            v-else
+            class="mr-2 h-4 w-4"
+          />
           <span>CSV</span>
         </Button>
         
@@ -146,13 +162,19 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
           v-if="downloadLinks.excel"
           variant="outline"
           :disabled="downloadingFiles['excel']"
-          @click="downloadFile(downloadLinks.excel!, 'xlsx')"
           class="flex items-center"
+          @click="downloadFile(downloadLinks.excel!, 'xlsx')"
         >
-          <div v-if="downloadingFiles['excel']" class="mr-2">
+          <div
+            v-if="downloadingFiles['excel']"
+            class="mr-2"
+          >
             <Loader2 class="h-4 w-4 animate-spin" />
           </div>
-          <FileSpreadsheet v-else class="mr-2 h-4 w-4" />
+          <FileSpreadsheet
+            v-else
+            class="mr-2 h-4 w-4"
+          />
           <span>Excel</span>
         </Button>
       </div>

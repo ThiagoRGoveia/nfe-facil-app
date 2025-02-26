@@ -23,35 +23,45 @@ const isEditing = ref(false);
       <Loader2 class="h-8 w-8 animate-spin text-primary" />
     </div>
 
-    <div v-else-if="auth.user" class="grid gap-6">
+    <div
+      v-else-if="auth.user"
+      class="grid gap-6"
+    >
       <div>
-        <ProfileCard
-          :user="auth.user"
-          :is-editing="isEditing"
-          @toggle-edit="isEditing = !isEditing"
-        />
-      </div>
-
-      <div v-if="!auth.user.isSocial">
         <Card>
-          <CardHeader>
-            <CardTitle>Segurança</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResetPassword />
-          </CardContent>
+          <ProfileCard
+            :user="auth.user"
+            :is-editing="isEditing"
+            @toggle-edit="isEditing = !isEditing"
+          />
         </Card>
       </div>
 
-      <div>
-        <Card>
-          <CardHeader>
-            <CardTitle>API</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ApiCredentials :user="auth.user" />
-          </CardContent>
-        </Card>
+      <div class="grid gap-6 md:grid-cols-2">
+        <div
+          v-if="auth.user.isSocial"
+          class="flex h-full"
+        >
+          <Card class="h-full w-full">
+            <CardHeader>
+              <CardTitle>Segurança</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResetPassword />
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div class="flex h-full">
+          <Card class="h-full w-full">
+            <CardHeader>
+              <CardTitle>API</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ApiCredentials :user="auth.user" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   </div>

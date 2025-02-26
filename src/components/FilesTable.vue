@@ -97,7 +97,7 @@ watch(tableOptions, () => {
 
 const columns = [
   {
-    title: "File Name",
+    title: "Nome do Arquivo",
     key: "fileName",
     sortable: true,
   },
@@ -107,12 +107,12 @@ const columns = [
     sortable: false,
   },
   {
-    title: "Results",
+    title: "Resultados",
     key: "results",
     sortable: false,
   },
   {
-    title: "Status",
+    title: "Status",  
     key: "status",
     sortable: true,
   },
@@ -160,22 +160,37 @@ onMounted(() => {
   <div>
     <Table>
       <TableCaption v-if="files.length === 0 && !loading">
-        No files found
+        Nenhum arquivo encontrado
       </TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead v-for="column in columns" :key="column.key" :class="{ 'cursor-pointer': column.sortable }" @click="column.sortable && toggleSort(column.key)">
+          <TableHead
+            v-for="column in columns"
+            :key="column.key"
+            :class="{ 'cursor-pointer': column.sortable }"
+            @click="column.sortable && toggleSort(column.key)"
+          >
             <div class="flex items-center gap-1">
               {{ column.title }}
-              <component :is="getSortIcon(column.key)" v-if="column.sortable" class="h-4 w-4" />
+              <component
+                :is="getSortIcon(column.key)"
+                v-if="column.sortable"
+                class="h-4 w-4"
+              />
             </div>
           </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow v-if="loading" class="h-24">
-          <TableCell :colspan="columns.length" class="text-center">
-            Loading...
+        <TableRow
+          v-if="loading"
+          class="h-24"
+        >
+          <TableCell
+            :colspan="columns.length"
+            class="text-center"
+          >
+            Carregando...
           </TableCell>
         </TableRow>
         <TableRow 
@@ -188,8 +203,8 @@ onMounted(() => {
             <Button 
               variant="outline" 
               size="icon"
+              title="Baixar arquivo"
               @click="(event) => handleDownload(event, item)"
-              title="Download file"
             >
               <Download class="h-4 w-4" />
             </Button>
@@ -213,17 +228,20 @@ onMounted(() => {
 
     <div class="flex items-center justify-between space-x-2 py-4">
       <div class="flex-1 text-sm text-muted-foreground">
-        Showing {{ files.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} to 
-        {{ Math.min(currentPage * pageSize, totalItems) }} of {{ totalItems }} entries
+        Mostrando {{ files.length > 0 ? (currentPage - 1) * pageSize + 1 : 0 }} até 
+        {{ Math.min(currentPage * pageSize, totalItems) }} de {{ totalItems }} entradas
       </div>
-      <div v-if="totalPages > 1" class="flex items-center gap-1">
+      <div
+        v-if="totalPages > 1"
+        class="flex items-center gap-1"
+      >
         <Button 
           variant="outline" 
           size="sm"
           :disabled="currentPage === 1"
           @click="goToPage(currentPage - 1)"
         >
-          Previous
+          Anterior
         </Button>
         
         <div v-if="totalPages <= 5">
@@ -249,14 +267,20 @@ onMounted(() => {
           </Button>
           
           <!-- Ellipsis if needed -->
-          <span v-if="currentPage > 3" class="mx-1">...</span>
+          <span
+            v-if="currentPage > 3"
+            class="mx-1"
+          >...</span>
           
           <!-- Pages around current -->
-          <template v-for="(page, index) in [
-            Math.max(2, currentPage - 1), 
-            currentPage !== 1 && currentPage !== totalPages ? currentPage : null, 
-            Math.min(totalPages - 1, currentPage + 1)
-          ]" :key="index">
+          <template
+            v-for="(page, index) in [
+              Math.max(2, currentPage - 1), 
+              currentPage !== 1 && currentPage !== totalPages ? currentPage : null, 
+              Math.min(totalPages - 1, currentPage + 1)
+            ]"
+            :key="index"
+          >
             <Button 
               v-if="page !== null"
               size="sm"
@@ -268,7 +292,10 @@ onMounted(() => {
           </template>
           
           <!-- Ellipsis if needed -->
-          <span v-if="currentPage < totalPages - 2" class="mx-1">...</span>
+          <span
+            v-if="currentPage < totalPages - 2"
+            class="mx-1"
+          >...</span>
           
           <!-- Last page always visible -->
           <Button 
@@ -286,7 +313,7 @@ onMounted(() => {
           :disabled="currentPage === totalPages"
           @click="goToPage(currentPage + 1)"
         >
-          Next
+          Próximo
         </Button>
       </div>
     </div>
