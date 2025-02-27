@@ -3,7 +3,7 @@ import { ref, computed,  onMounted } from 'vue';
 import { useLazyQuery } from '@vue/apollo-composable';
 import { FIND_ALL_BATCH_PROCESSES } from '@/graphql/history';
 import type { BatchStatus, PaginatedBatchProcessResponse } from '@/graphql/generated/graphql';
-import FilesTable from '@/components/FilesTable.vue';
+import FilesTable from '@/components/business/file-conversion/FilesTable.vue';
 import {
   Table,
   TableBody,

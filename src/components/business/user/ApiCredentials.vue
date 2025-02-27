@@ -4,7 +4,7 @@ import { useMutation } from '@vue/apollo-composable';
 import { REFRESH_CLIENT_SECRET } from '@/graphql/user';
 import type { User } from '@/graphql/generated/graphql';
 import { Copy, Eye, EyeOff, RefreshCw, CheckCircle2 } from 'lucide-vue-next';
-import { FormField } from './ui/form';
+import { FormField } from '@/components/ui/form';
 
 const props = defineProps<{
   user: User;
