@@ -21,6 +21,11 @@ type Documents = {
     "\n  query GetUser {\n    getUser {\n      id\n      email\n      name\n      surname\n      credits\n      isSocial\n      clientId\n      clientSecret\n    }\n  }\n": typeof types.GetUserDocument,
     "\n  mutation UpdateUserPassword($id: String!, $input: UpdatePasswordDto!) {\n    updateUserPassword(id: $id, input: $input)\n  }\n": typeof types.UpdateUserPasswordDocument,
     "\n  mutation RefreshUserClientSecret($id: String!) {\n    refreshUserClientSecret(id: $id) {\n      id\n      clientId\n      clientSecret\n    }\n  }\n": typeof types.RefreshUserClientSecretDocument,
+    "\n  query FindAllWebhooks($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllWebhooks(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        name\n        url\n        status\n        authType\n        events\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": typeof types.FindAllWebhooksDocument,
+    "\n  query FindWebhookById($id: String!) {\n    findWebhookById(id: $id) {\n      id\n      name\n      url\n      status\n      authType\n      events\n      headers\n      maxRetries\n      timeout\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.FindWebhookByIdDocument,
+    "\n  mutation CreateWebhook($input: CreateWebhookDto!) {\n    createWebhook(input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n": typeof types.CreateWebhookDocument,
+    "\n  mutation UpdateWebhook($id: String!, $input: UpdateWebhookDto!) {\n    updateWebhook(id: $id, input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n": typeof types.UpdateWebhookDocument,
+    "\n  mutation DeleteWebhook($id: String!) {\n    deleteWebhook(id: $id)\n  }\n": typeof types.DeleteWebhookDocument,
 };
 const documents: Documents = {
     "\n  query FindAllBatchProcesses($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllBatchProcesses(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        status\n        totalFiles\n        processedFiles\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": types.FindAllBatchProcessesDocument,
@@ -30,6 +35,11 @@ const documents: Documents = {
     "\n  query GetUser {\n    getUser {\n      id\n      email\n      name\n      surname\n      credits\n      isSocial\n      clientId\n      clientSecret\n    }\n  }\n": types.GetUserDocument,
     "\n  mutation UpdateUserPassword($id: String!, $input: UpdatePasswordDto!) {\n    updateUserPassword(id: $id, input: $input)\n  }\n": types.UpdateUserPasswordDocument,
     "\n  mutation RefreshUserClientSecret($id: String!) {\n    refreshUserClientSecret(id: $id) {\n      id\n      clientId\n      clientSecret\n    }\n  }\n": types.RefreshUserClientSecretDocument,
+    "\n  query FindAllWebhooks($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllWebhooks(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        name\n        url\n        status\n        authType\n        events\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n": types.FindAllWebhooksDocument,
+    "\n  query FindWebhookById($id: String!) {\n    findWebhookById(id: $id) {\n      id\n      name\n      url\n      status\n      authType\n      events\n      headers\n      maxRetries\n      timeout\n      createdAt\n      updatedAt\n    }\n  }\n": types.FindWebhookByIdDocument,
+    "\n  mutation CreateWebhook($input: CreateWebhookDto!) {\n    createWebhook(input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n": types.CreateWebhookDocument,
+    "\n  mutation UpdateWebhook($id: String!, $input: UpdateWebhookDto!) {\n    updateWebhook(id: $id, input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n": types.UpdateWebhookDocument,
+    "\n  mutation DeleteWebhook($id: String!) {\n    deleteWebhook(id: $id)\n  }\n": types.DeleteWebhookDocument,
 };
 
 /**
@@ -74,6 +84,26 @@ export function gql(source: "\n  mutation UpdateUserPassword($id: String!, $inpu
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation RefreshUserClientSecret($id: String!) {\n    refreshUserClientSecret(id: $id) {\n      id\n      clientId\n      clientSecret\n    }\n  }\n"): (typeof documents)["\n  mutation RefreshUserClientSecret($id: String!) {\n    refreshUserClientSecret(id: $id) {\n      id\n      clientId\n      clientSecret\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query FindAllWebhooks($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllWebhooks(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        name\n        url\n        status\n        authType\n        events\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n"): (typeof documents)["\n  query FindAllWebhooks($pagination: Pagination, $filters: Filters, $sort: Sort) {\n    findAllWebhooks(pagination: $pagination, filters: $filters, sort: $sort) {\n      items {\n        id\n        name\n        url\n        status\n        authType\n        events\n        createdAt\n      }\n      page\n      pageSize\n      total\n      totalPages\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  query FindWebhookById($id: String!) {\n    findWebhookById(id: $id) {\n      id\n      name\n      url\n      status\n      authType\n      events\n      headers\n      maxRetries\n      timeout\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query FindWebhookById($id: String!) {\n    findWebhookById(id: $id) {\n      id\n      name\n      url\n      status\n      authType\n      events\n      headers\n      maxRetries\n      timeout\n      createdAt\n      updatedAt\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation CreateWebhook($input: CreateWebhookDto!) {\n    createWebhook(input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n"): (typeof documents)["\n  mutation CreateWebhook($input: CreateWebhookDto!) {\n    createWebhook(input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation UpdateWebhook($id: String!, $input: UpdateWebhookDto!) {\n    updateWebhook(id: $id, input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateWebhook($id: String!, $input: UpdateWebhookDto!) {\n    updateWebhook(id: $id, input: $input) {\n      id\n      name\n      url\n      status\n      authType\n      events\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation DeleteWebhook($id: String!) {\n    deleteWebhook(id: $id)\n  }\n"): (typeof documents)["\n  mutation DeleteWebhook($id: String!) {\n    deleteWebhook(id: $id)\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

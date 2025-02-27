@@ -6,9 +6,10 @@ import { useLazyQuery } from '@vue/apollo-composable';
 import { FIND_ALL_BATCH_PROCESSES } from '@/graphql/history';
 import type { PaginatedBatchProcessResponse } from '@/graphql/generated/graphql';
 
-import PrivateConversionForm from '@/components/PrivateConversionForm.vue';
-import HistoryTable from '@/components/HistoryTable.vue';
-import ProfileCard from '@/components/ProfileCard.vue';
+import PrivateConversionForm from '@/components/business/file-conversion/PrivateConversionForm.vue';
+import HistoryTable from '@/components/business/file-conversion/HistoryTable.vue';
+import WebhooksTable from '@/components/business/webhook/WebhooksTable.vue';
+import ProfileCard from '@/components/business/user/ProfileCard.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -22,7 +23,8 @@ import {
   FileJson,
   ChevronRight,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Link
 } from 'lucide-vue-next';
 
 const router = useRouter();
@@ -116,6 +118,19 @@ load();
           </CardHeader>
           <CardContent>
             <HistoryTable />
+          </CardContent>
+        </Card>
+        
+        <!-- Webhooks Section -->
+        <Card>
+          <CardHeader class="flex flex-row items-center justify-between">
+            <CardTitle class="flex items-center">
+              <Link class="mr-2" />
+              Webhooks
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WebhooksTable />
           </CardContent>
         </Card>
       </div>
