@@ -46,10 +46,5 @@ const toggleOpen = () => {
         </Card>
       </div>
     </div>
-    
-    <div v-else class="text-center py-8">
-      <AlertCircle class="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-      <p class="text-muted-foreground">Nenhum erro encontrado</p>
-    </div>
   </div>
 </template> 

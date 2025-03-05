@@ -125,7 +125,7 @@ const handleReset = () => {
     <ConversionForm
       v-if="!processing"
       @submit="handleSubmit"
-      :max-files="1"
+      :max-files="10"
     />
     
     <!-- Show results after processing -->
@@ -148,7 +148,7 @@ const handleReset = () => {
     >
       <div class="flex flex-col items-center gap-2">
         <Loader2 class="h-8 w-8 animate-spin text-primary" />
-        <span class="text-sm">Processing files...</span>
+        <span class="text-sm">Processando arquivos...</span>
       </div>
     </div>
   </div>

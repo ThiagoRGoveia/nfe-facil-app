@@ -114,7 +114,7 @@ const handleReset = () => {
     >
       <div class="flex flex-col items-center gap-2">
         <Loader2 class="h-8 w-8 animate-spin text-primary" />
-        <span class="text-sm">Processing files...</span>
+        <span class="text-sm">Processando arquivos...</span>
       </div>
     </div>
   </div>

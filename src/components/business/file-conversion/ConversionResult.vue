@@ -45,7 +45,7 @@ const hasLinks = computed(() => {
 });
 
 const shouldShowErrors = computed(() => {
-  return props.errors.length > 0 || !hasLinks.value;
+  return (props.errors.length > 0 || !hasLinks.value) && !props.loading;
 });
 
 const handleDownloadError = (message: string) => {
@@ -73,8 +73,8 @@ const handleReset = () => {
     
     <!-- Show error display if we have errors -->
     <FileErrorsDisplay 
-      :errors="errors"
       v-if="shouldShowErrors"
+      :errors="errors"
     />
     
     <!-- Show message if both links and errors are null but we have an error message -->
