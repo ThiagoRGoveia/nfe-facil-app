@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +15,14 @@ const props = withDefaults(defineProps<Props>(), {
   accept: ".pdf,.zip",
 });
 
-const fileInput = ref<HTMLInputElement | null>(null);
-const files = ref<File[]>([]);
+const fileInput = useTemplateRef<typeof Input>('fileInput');
 const dragActive = ref(false);
 
 const emit = defineEmits<{
   (e: "update:files", files: File[]): void;
 }>();
+
+const files = ref<File[]>([]);
 
 const onFilesChanged = (event: Event) => {
   const input = event.target as HTMLInputElement;
@@ -50,46 +51,9 @@ const clearFiles = () => {
   emit("update:files", files.value);
 };
 
-const onDragEnter = (e: DragEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  dragActive.value = true;
-};
-
-const onDragLeave = (e: DragEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  dragActive.value = false;
-};
-
-const onDragOver = (e: DragEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  dragActive.value = true;
-};
-
-const onDrop = (e: DragEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  dragActive.value = false;
-  
-  if (e.dataTransfer?.files) {
-    const newFiles = Array.from(e.dataTransfer.files);
-    
-    // Check if adding these files would exceed maxFiles
-    if (files.value.length + newFiles.length > props.maxFiles) {
-      alert(`You can only upload a maximum of ${props.maxFiles} files.`);
-      return;
-    }
-    
-    files.value = [...files.value, ...newFiles];
-    emit("update:files", files.value);
-  }
-};
-
 const triggerFileInput = () => {
   if (fileInput.value) {
-    fileInput.value.click();
+    fileInput.value.inputRef.click()
   }
 };
 
@@ -126,10 +90,6 @@ const formatFileSize = (bytes: number): string => {
         'border-primary/50 bg-primary/5': dragActive,
         'border-muted-foreground/25 hover:border-primary/50': !dragActive 
       }"
-      @dragenter="onDragEnter" 
-      @dragleave="onDragLeave" 
-      @dragover="onDragOver" 
-      @drop="onDrop"
     >
       <Input 
         ref="fileInput"

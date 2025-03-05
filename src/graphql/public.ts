@@ -6,6 +6,10 @@ export const PUBLIC_PROCESS_BATCH = gql`
       json
       csv
       excel
+      errors {
+        fileName
+        error
+      }
     }
   }
 `; 

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useForm } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/zod';
+import * as z from 'zod';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,86 +11,102 @@ import { FileFormat } from "@/graphql/generated/graphql";
 import FileUploader from "./FileUploader.vue";
 
 interface Props {
-  title: string;
+  title?: string;
+  maxFiles?: number;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  title: undefined,
+  maxFiles: 10,
+});
 
-const files = ref<File[]>([]);
-const selectedFormats = ref<FileFormat[]>(['JSON']);
-const formError = ref("");
+type ValidFormat = 'JSON' | 'CSV' | 'XLSX';
+
+interface FormValues {
+  files: File[];
+  formats: ValidFormat[];
+}
+
+interface FileError {
+  fileName: string;
+  error: string;
+}
+
+const fileErrors = ref<FileError[]>([]);
+const showErrors = ref(false);
 
 const outputFormats = [
-  { label: "JSON", value: "JSON" },
-  { label: "CSV", value: "CSV" },
-  { label: "XLSX", value: "XLSX" },
+  { label: "JSON", value: "JSON" as const },
+  { label: "CSV", value: "CSV" as const },
+  { label: "XLSX", value: "XLSX" as const },
 ];
+
+const formSchema = toTypedSchema(z.object({
+  files: z.array(z.instanceof(File)).min(1, "Por favor, selecione pelo menos um arquivo"),
+  formats: z.array(z.enum(['JSON', 'CSV', 'XLSX'])).min(1, "Por favor, selecione pelo menos um formato de saída")
+}));
+
+const form = useForm<FormValues>({
+  validationSchema: formSchema,
+  initialValues: {
+    files: [],
+    formats: ['JSON']
+  }
+});
 
 const emit = defineEmits<{
   (e: "submit", data: { files: File[]; formats: FileFormat[] }): void;
 }>();
 
-const toggleFormat = (format: FileFormat, checked: boolean) => {
+const toggleFormat = (format: ValidFormat, checked: boolean | 'indeterminate') => {
+  if (checked === 'indeterminate') {
+    return;
+  }
+  const currentFormats = form.values.formats ?? [];
   if (checked) {
-    selectedFormats.value.push(format);
+    form.setFieldValue('formats', [...currentFormats, format]);
   } else {
-    selectedFormats.value = selectedFormats.value.filter(f => f !== format);
+    form.setFieldValue('formats', currentFormats.filter(f => f !== format));
   }
 };
 
-const isFormatSelected = (format: FileFormat) => {
-  return selectedFormats.value.includes(format);
-};
-
-const handleSubmit = () => {
-  // Reset previous errors
-  formError.value = "";
-  
-  // Validate form
-  if (files.value.length === 0) {
-    formError.value = "Please upload at least one file";
-    return;
-  }
-  
-  if (selectedFormats.value.length === 0) {
-    formError.value = "Please select at least one output format";
-    return;
-  }
-  
+const onSubmit = form.handleSubmit((values: FormValues) => {
+  console.log('Form submitted!', values);
+  // Uncomment to enable emit when ready
   emit("submit", {
-    files: files.value,
-    formats: selectedFormats.value,
+    files: values.files,
+    formats: values.formats as FileFormat[],
   });
-};
+});
 </script>
 
 <template>
-  <Form
+  <form
     class="h-full"
-    @submit.prevent="handleSubmit"
+    @submit="onSubmit"
   >
     <Card class="h-full shadow-none border-0">
-      <CardHeader>
+      <CardHeader v-if="props.title">
         <CardTitle>{{ title }}</CardTitle>
       </CardHeader>
       
       <CardContent class="flex flex-col space-y-6 flex-grow">
-        <FormField name="files">
+        <FormField v-slot="{ componentField }" name="files">
           <FormItem>
             <FormControl>
               <FileUploader
-                v-model:files="files"
+                :files="form.values.files"
+                @update:files="(newFiles) => form.setFieldValue('files', newFiles)"
                 accept=".pdf,.zip"
                 class="flex-grow"
+                :max-files="props.maxFiles"
               />
             </FormControl>
-            <FormMessage v-if="files.length === 0 && formError">
-              {{ formError }}
-            </FormMessage>
+            <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField name="formats">
+        <FormField v-slot name="formats">
           <FormItem>
             <FormLabel class="text-base font-medium mb-2 block">
               Escolha os formatos desejados
@@ -102,8 +120,8 @@ const handleSubmit = () => {
               >
                 <Checkbox 
                   :id="`format-${format.value}`"
-                  :checked="isFormatSelected(format.value as FileFormat)"
-                  @update:checked="(checked: boolean) => toggleFormat(format.value as FileFormat, checked)"
+                  :model-value="form.values.formats.includes(format.value)"
+                  @update:model-value="(checked: boolean | 'indeterminate') => toggleFormat(format.value, checked)"
                 />
                 <Label 
                   :for="`format-${format.value}`"
@@ -113,9 +131,7 @@ const handleSubmit = () => {
                 </Label>
               </div>
             </div>
-            <FormMessage v-if="selectedFormats.length === 0 && formError">
-              {{ formError }}
-            </FormMessage>
+            <FormMessage />
           </FormItem>
         </FormField>
       </CardContent>
@@ -124,13 +140,12 @@ const handleSubmit = () => {
         <Button
           type="submit"
           class="w-full"
-          :disabled="files.length === 0 || selectedFormats.length === 0"
         >
           Extrair dados
         </Button>
       </CardFooter>
     </Card>
-  </Form>
+  </form>
 </template>
 
 <style scoped>

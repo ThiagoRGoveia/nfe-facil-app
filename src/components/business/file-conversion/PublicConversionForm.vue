@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch, computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { PUBLIC_PROCESS_BATCH } from "@/graphql/public";
 import {
@@ -8,24 +8,50 @@ import {
   PublicSyncProcessResponse,
 } from "@/graphql/generated/graphql";
 import ConversionForm from "./ConversionForm.vue";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  FileJson,
-  FileSpreadsheet,
-  FileText,
-  Loader2,
-  AlertCircle
-} from "lucide-vue-next";
+import ConversionResult from "./ConversionResult.vue";
+import { Loader2 } from "lucide-vue-next";
+import { useToast } from "@/components/ui/toast/use-toast";
+
+// Define interface for file errors
+interface FileError {
+  fileName: string;
+  error: string;
+}
 
 type ResponseData<T> = {
-  publicProcessBatchSync: T;
+  publicProcessBatchSync: T & {
+    errors?: FileError[];
+  };
 };
 
 const loading = ref(false);
-const downloadingFiles = ref<Record<string, boolean>>({});
+const processing = ref(false);
 const error = ref("");
+const fileErrors = ref<FileError[]>([]);
 const downloadLinks = ref<PublicSyncProcessResponse>({});
+const { toast } = useToast();
+
+// Watch for error changes and show a toast when there's an error
+watch(error, (newError) => {
+  if (newError) {
+    toast({
+      variant: "destructive",
+      title: "Erro",
+      description: newError
+    });
+  }
+});
+
+// Watch for file errors and show a toast when there are new file errors
+watch(fileErrors, (newErrors) => {
+  if (newErrors.length > 0) {
+    toast({
+      variant: "destructive",
+      title: "Erro ao processar arquivos",
+      description: `${newErrors.length} arquivo(s) falhou ao processar.`
+    });
+  }
+});
 
 const { mutate: processFiles } = useMutation<
   ResponseData<PublicSyncProcessResponse>,
@@ -36,33 +62,12 @@ const { mutate: processFiles } = useMutation<
   },
 });
 
-const downloadFile = async (url: string, format: string) => {
-  try {
-    downloadingFiles.value[format] = true;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to download ${format} file`);
-    }
-    const blob = await response.blob();
-    const downloadUrl = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = downloadUrl;
-    a.download = `converted-data.${format}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(downloadUrl);
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : `Failed to download ${format} file`;
-  } finally {
-    downloadingFiles.value[format] = false;
-  }
-};
-
 const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
   try {
+    processing.value = true;
     loading.value = true;
     error.value = "";
+    fileErrors.value = [];
     downloadLinks.value = {};
 
     const result = await processFiles({
@@ -79,107 +84,63 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
         csv: result.data.publicProcessBatchSync.csv,
         excel: result.data.publicProcessBatchSync.excel,
       };
+      
+      // Store file errors if they exist
+      if (result.data.publicProcessBatchSync.errors && 
+          result.data.publicProcessBatchSync.errors.length > 0) {
+        fileErrors.value = result.data.publicProcessBatchSync.errors;
+      }
+      
+      // Check if we have no links and no errors - general error case
+      if (!hasLinks.value && fileErrors.value.length === 0) {
+        error.value = "Tivemos um problema, tente novamente mais tarde";
+      }
     }
   } catch (e) {
-    error.value = e instanceof Error ? e.message : "An error occurred";
+    error.value = e instanceof Error ? e.message : "Tivemos um problema, tente novamente mais tarde";
   } finally {
     loading.value = false;
   }
+};
+
+const hasLinks = computed(() => {
+  return Object.values(downloadLinks.value).some(link => link !== null && link !== undefined);
+});
+
+const handleDownloadError = (message: string) => {
+  error.value = message;
+};
+
+const handleReset = () => {
+  processing.value = false;
+  downloadLinks.value = {};
+  fileErrors.value = [];
+  error.value = "";
 };
 </script>
 
 <template>
   <div class="h-full relative">
+    <!-- Show ConversionForm if not processing -->
     <ConversionForm
-      title="Conversão Pública de Arquivos"
+      v-if="!processing"
       @submit="handleSubmit"
+      :max-files="1"
     />
-
-    <div
-      v-if="error"
-      class="mt-4 p-4 border border-destructive text-destructive rounded-md flex items-start gap-2"
-    >
-      <AlertCircle class="h-5 w-5 flex-shrink-0 mt-0.5" />
-      <div>
-        <div class="font-medium">
-          Error
-        </div>
-        <div class="text-sm">
-          {{ error }}
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-if="Object.keys(downloadLinks).length > 0"
-      class="mt-4"
-    >
-      <Label class="text-base font-medium block mb-2">
-        Download Converted Files
-      </Label>
-      <div class="flex flex-wrap gap-2">
-        <Button
-          v-if="downloadLinks.json"
-          variant="outline"
-          :disabled="downloadingFiles['json']"
-          class="flex items-center"
-          @click="downloadFile(downloadLinks.json!, 'json')"
-        >
-          <div
-            v-if="downloadingFiles['json']"
-            class="mr-2"
-          >
-            <Loader2 class="h-4 w-4 animate-spin" />
-          </div>
-          <FileJson
-            v-else
-            class="mr-2 h-4 w-4"
-          />
-          <span>JSON</span>
-        </Button>
-        
-        <Button
-          v-if="downloadLinks.csv"
-          variant="outline"
-          :disabled="downloadingFiles['csv']"
-          class="flex items-center"
-          @click="downloadFile(downloadLinks.csv!, 'csv')"
-        >
-          <div
-            v-if="downloadingFiles['csv']"
-            class="mr-2"
-          >
-            <Loader2 class="h-4 w-4 animate-spin" />
-          </div>
-          <FileText
-            v-else
-            class="mr-2 h-4 w-4"
-          />
-          <span>CSV</span>
-        </Button>
-        
-        <Button
-          v-if="downloadLinks.excel"
-          variant="outline"
-          :disabled="downloadingFiles['excel']"
-          class="flex items-center"
-          @click="downloadFile(downloadLinks.excel!, 'xlsx')"
-        >
-          <div
-            v-if="downloadingFiles['excel']"
-            class="mr-2"
-          >
-            <Loader2 class="h-4 w-4 animate-spin" />
-          </div>
-          <FileSpreadsheet
-            v-else
-            class="mr-2 h-4 w-4"
-          />
-          <span>Excel</span>
-        </Button>
-      </div>
-    </div>
-
+    
+    <!-- Show results after processing -->
+    <ConversionResult 
+      v-else
+      :downloadLinks="downloadLinks"
+      :errors="fileErrors"
+      :errorMessage="error"
+      @error="handleDownloadError"
+      @reset="handleReset"
+    />
+    
+    <!-- Toast container -->
+    <Toaster />
+    
     <!-- Loading overlay -->
     <div 
       v-if="loading" 

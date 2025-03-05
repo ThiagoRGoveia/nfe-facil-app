@@ -49,7 +49,7 @@ const mockProducts = ref([
       </div>
     </section>
 
-    <section class="mb-16">
+    <!-- <section class="mb-16">
       <h2 class="text-2xl text-center mb-12">
         Extraia os dados da sua Nota Fiscal Eletrônica
       </h2>
@@ -57,6 +57,6 @@ const mockProducts = ref([
         :products="mockProducts"
         cta-text="Começar Agora"
       />
-    </section>
+    </section> -->
   </div>
 </template>

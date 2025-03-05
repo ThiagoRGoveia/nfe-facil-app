@@ -22,11 +22,6 @@ export type Scalars = {
   Upload: { input: any; output: any; }
 };
 
-export type BasicAuthConfigInput = {
-  password: Scalars['String']['input'];
-  username: Scalars['String']['input'];
-};
-
 export type BatchProcess = {
   __typename?: 'BatchProcess';
   createdAt: Scalars['DateTime']['output'];
@@ -77,7 +72,7 @@ export type CreateUserDto = {
 };
 
 export type CreateWebhookDto = {
-  authConfig?: InputMaybe<Array<BasicAuthConfigInput>>;
+  authConfig?: InputMaybe<Scalars['JSON']['input']>;
   authType: WebhookAuthType;
   events: Array<WebhookEvent>;
   headers?: InputMaybe<Scalars['JSON']['input']>;
@@ -102,8 +97,8 @@ export type FileProcessStatus =
   | 'PROCESSING'
   | '%future added value';
 
-export type FileToProcess = {
-  __typename?: 'FileToProcess';
+export type FileRecord = {
+  __typename?: 'FileRecord';
   batchProcess: BatchProcess;
   createdAt: Scalars['DateTime']['output'];
   error?: Maybe<Scalars['String']['output']>;
@@ -227,9 +222,9 @@ export type PaginatedBatchProcessResponse = {
   totalPages: Scalars['Float']['output'];
 };
 
-export type PaginatedFileToProcessResponse = {
-  __typename?: 'PaginatedFileToProcessResponse';
-  items: Array<FileToProcess>;
+export type PaginatedFileRecordResponse = {
+  __typename?: 'PaginatedFileRecordResponse';
+  items: Array<FileRecord>;
   page: Scalars['Float']['output'];
   pageSize: Scalars['Float']['output'];
   total: Scalars['Float']['output'];
@@ -268,10 +263,20 @@ export type Pagination = {
   pageSize?: Scalars['Float']['input'];
 };
 
+export type PublicSyncProcessError = {
+  __typename?: 'PublicSyncProcessError';
+  /** Error message */
+  error?: Maybe<Scalars['String']['output']>;
+  /** File name */
+  fileName: Scalars['String']['output'];
+};
+
 export type PublicSyncProcessResponse = {
   __typename?: 'PublicSyncProcessResponse';
   /** Base64 encoded CSV data */
   csv?: Maybe<Scalars['String']['output']>;
+  /** Errors */
+  errors?: Maybe<Array<PublicSyncProcessError>>;
   /** Base64 encoded Excel data */
   excel?: Maybe<Scalars['String']['output']>;
   /** Base64 encoded JSON data */
@@ -281,7 +286,7 @@ export type PublicSyncProcessResponse = {
 export type Query = {
   __typename?: 'Query';
   findAllBatchProcesses: PaginatedBatchProcessResponse;
-  findAllFiles: PaginatedFileToProcessResponse;
+  findAllFiles: PaginatedFileRecordResponse;
   findAllTemplates: PaginatedTemplateResponse;
   findAllUsers: PaginatedUserResponse;
   findAllWebhooks: PaginatedWebhookResponse;
@@ -468,7 +473,7 @@ export type FindAllFilesQueryVariables = Exact<{
 }>;
 
 
-export type FindAllFilesQuery = { __typename?: 'Query', findAllFiles: { __typename?: 'PaginatedFileToProcessResponse', page: number, pageSize: number, total: number, totalPages: number, items: Array<{ __typename?: 'FileToProcess', id: string, fileName: string, filePath?: string | null, status: FileProcessStatus, result?: any | null, error?: string | null, createdAt: any }> } };
+export type FindAllFilesQuery = { __typename?: 'Query', findAllFiles: { __typename?: 'PaginatedFileRecordResponse', page: number, pageSize: number, total: number, totalPages: number, items: Array<{ __typename?: 'FileRecord', id: string, fileName: string, filePath?: string | null, status: FileProcessStatus, result?: any | null, error?: string | null, createdAt: any }> } };
 
 export type ProcessBatchSyncMutationVariables = Exact<{
   input: CreateBatchInput;

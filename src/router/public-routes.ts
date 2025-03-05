@@ -1,4 +1,13 @@
-export const publicRoutes = ["/", "/login", "/callback", "/error"] as const;
+export const publicRoutes = [
+  "/", 
+  "/login", 
+  "/callback", 
+  "/error", 
+  "/test",
+  "/test/download-cards",
+  "/test/file-errors",
+  "/test/combined-workflow"
+] as const;
 
 export type PublicRoute = (typeof publicRoutes)[number];
 
