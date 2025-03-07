@@ -37,3 +37,20 @@ export const FIND_ALL_FILES = gql`
     }
   }
 `;
+
+export const FIND_BATCH_PROCESS_BY_ID = gql`
+  query FindBatchProcessById($id: String!) {
+    findBatchProcessById(id: $id) {
+      id
+      status
+      totalFiles
+      processedFiles
+      createdAt
+      updatedAt
+      requestedFormats
+      jsonResults
+      csvResults
+      excelResults
+    }
+  }
+`;

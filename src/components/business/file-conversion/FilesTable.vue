@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useLazyQuery } from '@vue/apollo-composable';
 import { FIND_ALL_FILES } from '@/graphql/history';
-import type { FileProcessStatus, FileToProcess } from '@/graphql/generated/graphql';
+import type { FileProcessStatus, FileRecord } from '@/graphql/generated/graphql';
 import {
   Table,
   TableBody,
@@ -43,7 +43,7 @@ interface TableOptions {
   search?: string;
 }
 
-interface FileItem extends FileToProcess {
+interface FileItem extends FileRecord {
   id: string;
   fileName: string;
   filePath?: string | null;
@@ -54,6 +54,7 @@ interface FileItem extends FileToProcess {
 
 const props = defineProps<{
   batchId: string;
+  refreshTrigger?: number;
 }>();
 
 // Pagination state
@@ -74,7 +75,7 @@ const tableOptions = computed<TableOptions>(() => ({
   sortBy: [{ key: sortColumn.value, order: sortDirection.value }],
 }));
 
-const { load, result, loading } = useLazyQuery(FIND_ALL_FILES, () => ({
+const { load, result, loading, refetch } = useLazyQuery(FIND_ALL_FILES, () => ({
   pagination: {
     page: tableOptions.value.page,
     pageSize: tableOptions.value.itemsPerPage,
@@ -95,7 +96,8 @@ const { load, result, loading } = useLazyQuery(FIND_ALL_FILES, () => ({
 {
     keepPreviousResult: true,
     prefetch: false,
-    fetchPolicy: 'cache-first'
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   });
 
 const files = computed<FileItem[]>(() => {
@@ -171,6 +173,18 @@ const getStatusLabel = (status: FileProcessStatus) => {
     default: return status;
   }
 };
+
+// Watch for changes to the refresh trigger and reload data when it changes
+watch(() => props.refreshTrigger, () => {
+  if (props.refreshTrigger) {
+    refetch();
+  }
+});
+
+// Watch for changes in pagination or sorting
+watch([currentPage, pageSize, sortColumn, sortDirection], () => {
+  refetch();
+});
 
 onMounted(() => {
   load();
