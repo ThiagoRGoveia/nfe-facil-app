@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useLazyQuery } from "@vue/apollo-composable";
 import { FIND_BATCH_PROCESS_BY_ID } from "@/graphql/history";
 import ConversionResult from "@/components/business/file-conversion/ConversionResult.vue";
@@ -10,17 +10,32 @@ import { Loader2, RefreshCw } from "lucide-vue-next";
 import { BatchProcess } from "@/graphql/generated/graphql";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
 // Define badge variant types based on the available options in the UI kit
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "info" | "success" | "violet" | "purple" | "yellow" | "green" | null | undefined;
 
 const route = useRoute();
+const router = useRouter();
 const batchId = computed(() => (route.params as { id: string }).id);
 const { toast } = useToast();
 const isRefreshing = computed(() => queryLoading.value && batchProcess.value !== null);
 
 // A counter to trigger refreshes in child components
 const refreshTrigger = ref(0);
+
+// Track the source of navigation (history or direct from dashboard)
+const fromHistory = computed(() => {
+  // This could be enhanced with actual path tracking if needed
+  return route.query.from === 'history';
+});
 
 // Execute the query to fetch batch process details
 const { result, load, loading: queryLoading, error: queryError, refetch } = useLazyQuery(
@@ -131,6 +146,23 @@ const getFormatBadgeVariant = (index: number): BadgeVariant => {
 
 <template>
   <div class="container py-8">
+    <!-- Breadcrumbs -->
+    <Breadcrumb class="mb-4">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink @click="router.push('/dashboard')">Dashboard</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem v-if="fromHistory">
+          <BreadcrumbLink @click="router.push('/history')">Histórico</BreadcrumbLink>
+          <BreadcrumbSeparator />
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Detalhes</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+    
     <div class="flex justify-between items-center mb-4">
       <h1 class="text-2xl font-bold">Detalhes da Conversão</h1>
       <Button 

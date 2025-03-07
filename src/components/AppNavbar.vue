@@ -39,8 +39,6 @@ const handleAuth = () => {
 
 // Navigation items array - show protected routes only when authenticated
 const navItems = computed(() => [
-  { title: "Home", icon: "home", to: "/" },
-  { title: "Public (TESTE)", icon: "file", to: "/public" },
   ...(isAuthenticated.value
     ? [
         { title: "Dashboard", icon: "layout-dashboard", to: "/dashboard" },

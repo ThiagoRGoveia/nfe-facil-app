@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
+import { useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 
 interface BatchProcess {
   id: string;
@@ -10,6 +20,7 @@ interface BatchProcess {
   createdAt: string;
 }
 
+const router = useRouter();
 const selectedProcess = ref<BatchProcess | null>(null);
 
 const handleRowClick = (item: BatchProcess) => {
@@ -19,6 +30,21 @@ const handleRowClick = (item: BatchProcess) => {
 
 <template>
   <div class="container mx-auto px-4 py-8">
+    <!-- Breadcrumbs -->
+    <Breadcrumb class="mb-4">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink as-child>
+            <RouterLink to="/dashboard">Dashboard</RouterLink>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Histórico</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+    
     <div class="mb-8">
       <h1 class="text-2xl font-bold">
         Processing History

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed,  onMounted } from 'vue';
 import { useLazyQuery } from '@vue/apollo-composable';
+import { useRouter } from 'vue-router';
 import { FIND_ALL_BATCH_PROCESSES } from '@/graphql/history';
 import type { BatchStatus, PaginatedBatchProcessResponse } from '@/graphql/generated/graphql';
-import FilesTable from '@/components/business/file-conversion/FilesTable.vue';
 import {
   Table,
   TableBody,
@@ -16,12 +16,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   ChevronDown,
   ChevronUp,
@@ -56,6 +50,9 @@ interface TableOptions {
   groupBy?: Array<string>;
   search?: string;
 }
+
+// Initialize router
+const router = useRouter();
 
 // Pagination state
 const currentPage = ref(1);
@@ -177,14 +174,12 @@ const toggleSort = (columnKey: string) => {
   }
 };
 
-const selectedItem = ref<HistoryItem | null>(null);
-const showDialog = ref(false);
-const filesTableLoaded = ref(false);
-
+// Handle row click by navigating to the detail page
 const handleRowClick = (item: HistoryItem) => {
-  selectedItem.value = item;
-  showDialog.value = true;
-  filesTableLoaded.value = false;
+  router.push({
+    path: `/files/${item.id}`,
+    query: { from: 'history' }
+  });
   emit("row-click", item);
 };
 
@@ -196,11 +191,6 @@ const handlePageChange = (page: number) => {
 onMounted(() => {
   load();
 });
-
-// Function to mark the files table as loaded
-const onFilesTableMounted = () => {
-  filesTableLoaded.value = true;
-};
 
 const emit = defineEmits<{
   (e: "row-click", item: HistoryItem): void;
@@ -325,19 +315,6 @@ const emit = defineEmits<{
         </PaginationList>
       </Pagination>
     </div>
-
-    <Dialog v-model:open="showDialog">
-      <DialogContent class="sm:max-w-[1200px]">
-        <DialogHeader>
-          <DialogTitle>Arquivos processados</DialogTitle>
-        </DialogHeader>
-        <FilesTable
-          v-if="selectedItem"
-          :batch-id="selectedItem.id"
-          @vue:mounted="onFilesTableMounted"
-        />
-      </DialogContent>
-    </Dialog>
   </div>
 </template>
 

@@ -13,6 +13,14 @@ import ProfileCard from '@/components/business/user/ProfileCard.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb';
 
 import {
   LayoutDashboard,
@@ -71,6 +79,15 @@ load();
 <template>
   <!-- Option 1: Using a wider max-width -->
   <div class="max-w-[1600px] px-4 py-6 mx-auto">
+    <!-- Breadcrumbs -->
+    <Breadcrumb class="mb-4">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Dashboard</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+    
     <!-- Dashboard Header -->
     <div class="mb-6">
       <Card>
