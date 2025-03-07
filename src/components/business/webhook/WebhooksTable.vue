@@ -213,6 +213,7 @@ const getEventLabel = (event: WebhookEvent) => {
 
 // Handle completed events from child components
 const handleWebhookCreated = () => {
+  console.log('handleWebhookCreated');
   refetch();
 };
 

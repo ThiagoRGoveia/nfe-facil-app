@@ -101,31 +101,11 @@ watch(() => form.values.authType, (newAuthType) => {
   }
 });
 
-// Handle update webhook success and error
-const handleUpdateWebhookError = (error: ApolloError) => {
-  toast({
-    title: "Erro ao atualizar webhook",
-    description: error.message,
-    variant: "destructive",
-  });
-  isSubmitting.value = false;
-};
-
-const handleUpdateWebhookCompleted = () => {
-  toast({
-    title: "Webhook atualizado",
-    description: "O webhook foi atualizado com sucesso.",
-  });
-  emit('update:show', false);
-  isSubmitting.value = false;
-  emit('updated');
-};
-
 // Edit form submission
 const onSubmit = form.handleSubmit(async (values) => {
   isSubmitting.value = true;
   try {
-    if (!props.webhook) return Promise.resolve();
+    if (!props.webhook) return;
     
     const id = props.webhook.id;
     const input = {
@@ -138,18 +118,31 @@ const onSubmit = form.handleSubmit(async (values) => {
       active: values.active
     };
 
-    await updateWebhook({
-      id,
-      input,
-      onCompleted: handleUpdateWebhookCompleted,
-      onError: handleUpdateWebhookError
-    });
-    emit('update:show', false);
-    isSubmitting.value = false;
-    form.resetForm();
+    await updateWebhook({ id, input })
+      .then(() => {
+        toast({
+          title: "Webhook atualizado",
+          description: "O webhook foi atualizado com sucesso.",
+        });
+        emit('updated');
+        emit('update:show', false);
+        form.resetForm();
+      })
+      .catch((error: ApolloError) => {
+        toast({
+          title: "Erro ao atualizar webhook",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
   } catch (error) {
-    handleUpdateWebhookError(error as ApolloError);
-    return Promise.resolve();
+    toast({
+      title: "Erro ao atualizar webhook",
+      description: (error as Error).message,
+      variant: "destructive",
+    });
+  } finally {
+    isSubmitting.value = false;
   }
 });
 

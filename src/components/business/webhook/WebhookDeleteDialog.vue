@@ -35,40 +35,36 @@ const isSubmitting = ref(false);
 // Delete webhook mutation
 const { mutate: deleteWebhook } = useMutation(DELETE_WEBHOOK);
 
-// Handle delete webhook success and error
-const handleDeleteWebhookError = (error: ApolloError) => {
-  toast({
-    title: "Erro ao deletar webhook",
-    description: error.message,
-    variant: "destructive",
-  });
-  isSubmitting.value = false;
-};
-
-const handleDeleteWebhookCompleted = () => {
-  toast({
-    title: "Webhook removido",
-    description: "O webhook foi removido com sucesso.",
-  });
-  emit('update:show', false);
-  isSubmitting.value = false;
-  emit('deleted');
-};
-
 // Handle delete webhook
 const handleDeleteWebhook = async () => {
   if (!props.webhook) return;
   
   isSubmitting.value = true;
   try {
-    await deleteWebhook({ 
-      id: props.webhook.id,
-      onCompleted: handleDeleteWebhookCompleted,
-      onError: handleDeleteWebhookError
-    });
-    emit('update:show', false);
+    await deleteWebhook({ id: props.webhook.id })
+      .then(() => {
+        toast({
+          title: "Webhook removido",
+          description: "O webhook foi removido com sucesso.",
+        });
+        emit('deleted');
+        emit('update:show', false);
+      })
+      .catch((error: ApolloError) => {
+        toast({
+          title: "Erro ao deletar webhook",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
   } catch (error) {
-    handleDeleteWebhookError(error as ApolloError);
+    toast({
+      title: "Erro ao deletar webhook",
+      description: (error as Error).message,
+      variant: "destructive",
+    });
+  } finally {
+    isSubmitting.value = false;
   }
 };
 

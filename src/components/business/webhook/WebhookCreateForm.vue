@@ -97,28 +97,6 @@ watch(() => form.values.authType, (newAuthType) => {
   }
 });
 
-// Handle create webhook success and error
-const handleCreateWebhookError = (error: ApolloError) => {
-  toast({
-    title: "Erro ao criar webhook",
-    description: error.message,
-    variant: "destructive",
-  });
-  isSubmitting.value = false;
-  
-};
-
-const handleCreateWebhookCompleted = () => {
-  toast({
-    title: "Webhook criado",
-    description: "O webhook foi criado com sucesso.",
-  });
-  emit('update:show', false);
-  isSubmitting.value = false;
-  emit('created');
-  form.resetForm();
-};
-
 // Create form submission
 const onSubmit = form.handleSubmit(async (values) => {
   isSubmitting.value = true;
@@ -132,16 +110,31 @@ const onSubmit = form.handleSubmit(async (values) => {
       authConfig: values.authConfig
     };
 
-    await createWebhook({
-      input,
-      onCompleted: handleCreateWebhookCompleted,
-      onError: handleCreateWebhookError
-    });
-    form.resetForm();
-    emit('update:show', false);
+    await createWebhook({ input })
+      .then(() => {
+        toast({
+          title: "Webhook criado",
+          description: "O webhook foi criado com sucesso.",
+        });
+        form.resetForm();
+        emit('created');
+        emit('update:show', false);
+      })
+      .catch((error: ApolloError) => {
+        toast({
+          title: "Erro ao criar webhook",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
   } catch (error) {
-    handleCreateWebhookError(error as ApolloError);
-    return Promise.resolve();
+    toast({
+      title: "Erro ao criar webhook",
+      description: (error as Error).message,
+      variant: "destructive",
+    });
+  } finally {
+    isSubmitting.value = false;
   }
 });
 
