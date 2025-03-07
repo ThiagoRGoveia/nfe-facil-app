@@ -3,64 +3,422 @@
 @tailwind utilities;
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
-    --primary: 24 9.8% 10%;
+    /* Light Theme - Tropical Sunrise */
+    --background: 40 100% 97%;
+    --foreground: 20 30% 15%;
+    --card: 36 100% 99%;
+    --card-foreground: 20 30% 15%;
+    --popover: 36 100% 99%;
+    --popover-foreground: 20 30% 15%;
+    --primary: 25 95% 53%;
     --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 24 9.8% 10%;
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 24 9.8% 10%;
+    --secondary: 182 85% 40%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 30 20% 90%;
+    --muted-foreground: 20 30% 30%;
+    --accent: 324 100% 60%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 20 14.3% 4.1%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 30 30% 85%;
+    --input: 30 30% 85%;
+    --ring: 25 95% 53%;
+    --chart-1: 25 95% 53%;
+    --chart-2: 182 85% 40%;
+    --chart-3: 324 100% 60%;
+    --chart-4: 55 96% 58%;
+    --chart-5: 276 83% 58%;
     --radius: 0.5rem
   }
+
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
-    --card: 20 14.3% 4.1%;
-    --card-foreground: 60 9.1% 97.8%;
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 60 9.1% 97.8%;
-    --primary: 60 9.1% 97.8%;
-    --primary-foreground: 24 9.8% 10%;
-    --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
-    --muted: 12 6.5% 15.1%;
-    --muted-foreground: 24 5.4% 63.9%;
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
-    --ring: 24 5.7% 82.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    /* Carbon Dark Theme with Purple Accents */
+    --background: 0 0% 14%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 275 80% 65%; /* Light purple */
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 25%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 275 80% 65%; /* Light purple */
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 95%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 275 80% 65%; /* Light purple */
+    --chart-1: 275 80% 65%;
+    --chart-2: 200 85% 60%;
+    --chart-3: 335 80% 65%;
+    --chart-4: 45 90% 65%;
+    --chart-5: 150 80% 50%;
+  }
+
+  .ai-future {
+    /* AI Future Theme - Neon Cyberpunk */
+    --background: 230 25% 8%;
+    --foreground: 180 100% 85%;
+    --card: 230 30% 12%;
+    --card-foreground: 180 100% 85%;
+    --popover: 230 30% 12%;
+    --popover-foreground: 180 100% 85%;
+    --primary: 160 100% 50%;
+    --primary-foreground: 230 30% 10%;
+    --secondary: 280 100% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 230 25% 16%;
+    --muted-foreground: 180 70% 70%;
+    --accent: 320 100% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 65%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 70% 40%;
+    --input: 220 70% 30%;
+    --ring: 160 100% 50%;
+    --chart-1: 160 100% 50%;
+    --chart-2: 280 100% 60%;
+    --chart-3: 320 100% 60%;
+    --chart-4: 45 100% 60%;
+    --chart-5: 200 100% 60%;
+  }
+
+  .paper {
+    /* Paper Theme - Tactile, Minimal, Textured */
+    --background: 36 30% 97%;
+    --foreground: 25 40% 15%;
+    --card: 36 20% 95%;
+    --card-foreground: 25 40% 15%;
+    --popover: 36 20% 95%;
+    --popover-foreground: 25 40% 15%;
+    --primary: 28 75% 45%;
+    --primary-foreground: 36 30% 97%;
+    --secondary: 12 10% 85%;
+    --secondary-foreground: 25 40% 20%;
+    --muted: 36 10% 90%;
+    --muted-foreground: 25 25% 35%;
+    --accent: 18 80% 50%;
+    --accent-foreground: 36 30% 97%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 36 30% 97%;
+    --border: 25 25% 80%;
+    --input: 25 25% 80%;
+    --ring: 28 75% 45%;
+    --chart-1: 28 75% 45%;
+    --chart-2: 40 60% 50%;
+    --chart-3: 18 80% 50%;
+    --chart-4: 10 70% 55%;
+    --chart-5: 35 65% 48%;
+    --radius: 0px; /* Sharp corners for paper-like feel */
+  }
+
+  .old-west {
+    /* Old West Theme - Dusty, Rustic, Vintage */
+    --background: 35 25% 88%;
+    --foreground: 30 30% 15%;
+    --card: 35 15% 83%;
+    --card-foreground: 30 30% 15%;
+    --popover: 35 15% 83%;
+    --popover-foreground: 30 30% 15%;
+    --primary: 25 70% 40%;
+    --primary-foreground: 35 25% 88%;
+    --secondary: 32 20% 65%;
+    --secondary-foreground: 30 30% 15%;
+    --muted: 30 15% 75%;
+    --muted-foreground: 30 20% 35%;
+    --accent: 15 80% 35%;
+    --accent-foreground: 35 25% 88%;
+    --destructive: 0 65% 40%;
+    --destructive-foreground: 35 25% 88%;
+    --border: 30 30% 70%;
+    --input: 30 30% 70%;
+    --ring: 25 70% 40%;
+    --chart-1: 25 70% 40%;
+    --chart-2: 32 60% 30%;
+    --chart-3: 15 80% 35%;
+    --chart-4: 45 65% 37%;
+    --chart-5: 5 55% 30%;
+    --radius: 0.125rem; /* Slightly rounded corners for rustic feel */
+  }
+
+  .queer-rock {
+    /* 80s Queer Rock Theme - Bold, Vibrant, Rebellious */
+    --background: 300 15% 15%;
+    --foreground: 320 100% 85%;
+    --card: 300 20% 20%;
+    --card-foreground: 320 100% 85%;
+    --popover: 300 20% 20%;
+    --popover-foreground: 320 100% 85%;
+    --primary: 320 100% 60%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 255 100% 65%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 300 20% 25%;
+    --muted-foreground: 320 70% 75%;
+    --accent: 45 100% 60%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 60%;
+    --destructive-foreground: 0 0% 0%;
+    --border: 300 50% 30%;
+    --input: 300 50% 30%;
+    --ring: 320 100% 60%;
+    --chart-1: 320 100% 60%;
+    --chart-2: 255 100% 65%;
+    --chart-3: 45 100% 60%;
+    --chart-4: 180 100% 55%;
+    --chart-5: 285 100% 60%;
+    --radius: 0rem; /* Sharp corners for that 80s vibe */
+  }
+
+  .chaos {
+    /* CHAOS Theme - Wild, Unpredictable, Mind-bending */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+    --popover: 280 100% 50%;
+    --popover-foreground: 60 100% 50%;
+    --primary: 0 100% 50%;
+    --primary-foreground: 180 100% 50%;
+    --secondary: 240 100% 50%;
+    --secondary-foreground: 60 100% 50%;
+    --muted: 120 100% 25%;
+    --muted-foreground: 300 100% 75%;
+    --accent: 60 100% 50%;
+    --accent-foreground: 240 100% 50%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 180 100% 50%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 300 100% 50%;
+    --chart-1: 0 100% 50%;
+    --chart-2: 60 100% 50%;
+    --chart-3: 120 100% 50%;
+    --chart-4: 240 100% 50%;
+    --chart-5: 300 100% 50%;
+    --radius: 50%; /* Extremely rounded */
+  }
+
+  .harmony {
+    /* Harmony Theme - Renaissance-inspired, Marble, Classical */
+    --background: 40 30% 98%;
+    --foreground: 30 25% 18%;
+    --card: 40 20% 96%;
+    --card-foreground: 30 25% 18%;
+    --popover: 40 20% 96%;
+    --popover-foreground: 30 25% 18%;
+    --primary: 35 40% 45%;
+    --primary-foreground: 40 30% 98%;
+    --secondary: 44 25% 92%;
+    --secondary-foreground: 30 25% 18%;
+    --muted: 30 15% 90%;
+    --muted-foreground: 30 15% 40%;
+    --accent: 38 60% 50%;
+    --accent-foreground: 40 30% 98%;
+    --destructive: 0 40% 50%;
+    --destructive-foreground: 40 30% 98%;
+    --border: 30 15% 85%;
+    --input: 30 15% 85%;
+    --ring: 35 40% 45%;
+    --chart-1: 35 40% 45%;
+    --chart-2: 35 30% 60%;
+    --chart-3: 38 60% 50%;
+    --chart-4: 25 50% 45%;
+    --chart-5: 44 40% 60%;
+    --radius: 0.3rem; /* Gently rounded corners inspired by classical forms */
   }
 }
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Paper Theme Specifics */
+  .paper button {
+    @apply shadow-md border-2 border-solid;
+  }
+  .paper * {
+    font-family: "Courier New", Courier, monospace !important;
+  }
+  .paper h1, .paper h2, .paper h3, .paper h4 {
+    @apply underline decoration-dotted underline-offset-4;
+  }
+
+  /* Old West Theme Specifics */
+  .old-west * {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif !important;
+  }
+  .old-west button {
+    @apply border-2 border-solid shadow-inner;
+  }
+  .old-west h1, .old-west h2, .old-west h3 {
+    font-family: "Blackletter", "Old English", serif !important;
+  }
+
+  /* 80s Queer Rock Theme Specifics */
+  .queer-rock * {
+    @apply font-bold;
+    letter-spacing: 0.05em;
+  }
+  .queer-rock button {
+    @apply uppercase border-2 border-solid;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.8);
+  }
+  .queer-rock h1, .queer-rock h2, .queer-rock h3 {
+    text-transform: uppercase;
+    text-shadow: 3px 3px 0px rgba(255,0,255,0.5);
+  }
+
+  /* CHAOS Theme Specifics - Go completely wild here */
+  .chaos * {
+    @apply transition-all duration-500 ease-in-out;
+  }
+  .chaos *:hover {
+    @apply animate-rainbow;
+  }
+  .chaos h1, .chaos h2, .chaos h3, .chaos h4 {
+    @apply animate-rainbow;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    transform: skewX(-5deg);
+  }
+  .chaos button {
+    @apply animate-float border-4 border-dashed;
+    transform: rotate(1deg);
+  }
+  .chaos button:hover {
+    @apply animate-wiggle;
+    transform: scale(1.1) rotate(-1deg);
+  }
+  .chaos nav {
+    @apply animate-disco;
+  }
+  .chaos input, .chaos select, .chaos textarea {
+    @apply animate-shake;
+    transform: skewX(-3deg);
+  }
+  .chaos table {
+    @apply animate-pulse;
+  }
+  .chaos a {
+    @apply animate-glitch;
+    text-decoration: wavy underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .chaos img {
+    filter: hue-rotate(45deg) saturate(150%) contrast(120%);
+  }
+  .chaos img:hover {
+    animation: hue-rotation 3s linear infinite;
+  }
+  
+  /* Harmony Theme Specifics - Renaissance-inspired elegance */
+  .harmony * {
+    @apply transition-colors duration-500 ease-in-out;
+    font-family: "Trajan Pro", "Palatino Linotype", "Book Antiqua", Georgia, serif !important;
+  }
+  .harmony h1, .harmony h2, .harmony h3 {
+    font-family: "Trajan Pro", "Palatino Linotype", "Book Antiqua", Georgia, serif !important;
+    letter-spacing: 0.05em;
+    line-height: 1.618; /* Golden ratio */
+  }
+  .harmony h1 {
+    @apply font-light;
+    font-size: 2.618rem; /* Golden ratio^2 */
+  }
+  .harmony h2 {
+    @apply font-light;
+    font-size: 1.618rem; /* Golden ratio */
+  }
+  .harmony p {
+    line-height: 1.618; /* Golden ratio */
+    @apply text-justify;
+  }
+  .harmony button {
+    @apply border border-solid shadow-sm;
+    transition: all 0.3s ease;
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.05) 100%);
+  }
+  .harmony button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .harmony button:active {
+    transform: translateY(1px);
+  }
+  .harmony nav {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.02) 100%);
+  }
+  .harmony a {
+    text-decoration: none;
+    background-image: linear-gradient(to right, currentColor 0%, currentColor 100%);
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    transition: background-size 0.3s ease-in-out;
+  }
+  .harmony a:hover {
+    background-size: 100% 1px;
+  }
+  .harmony input, .harmony select, .harmony textarea {
+    @apply border border-solid rounded-sm shadow-inner;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(255,255,255,0.1) 100%);
+  }
+  .harmony img {
+    @apply shadow-md rounded-sm;
+    transition: all 0.5s ease;
+  }
+  .harmony img:hover {
+    @apply shadow-lg;
+    transform: scale(1.02);
+  }
+  .harmony table {
+    @apply bg-card shadow-sm;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+  }
+  .harmony th {
+    @apply bg-secondary text-secondary-foreground font-normal;
+    letter-spacing: 0.05em;
+  }
+  .harmony td, .harmony th {
+    @apply p-4;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .harmony tr:last-child td {
+    border-bottom: none;
+  }
+  .harmony section, .harmony article {
+    max-width: 38.2%; /* Based on Golden Ratio */
+    margin: 0 auto;
+    padding: 1.618rem; /* Golden Ratio */
+  }
+  .harmony blockquote {
+    @apply italic ml-6 border-l-2 pl-4 py-1 text-muted-foreground;
+    line-height: 1.618; /* Golden Ratio */
+  }
+  .harmony footer {
+    @apply text-center py-6 text-sm;
+    letter-spacing: 0.1em;
+  }
+  
+  @keyframes hue-rotation {
+    from {
+      filter: hue-rotate(0deg) saturate(150%) contrast(120%);
+    }
+    to {
+      filter: hue-rotate(360deg) saturate(150%) contrast(120%);
+    }
   }
 }

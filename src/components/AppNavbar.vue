@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import { useColorMode } from "@vueuse/core";
 import { useRouter } from "vue-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,13 +15,9 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { MoonIcon, SunIcon, MenuIcon } from "lucide-vue-next";
+import { MenuIcon } from "lucide-vue-next";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-const colorMode = useColorMode();
-const isDark = computed(() => colorMode.value === 'dark');
-const toggleDark = () => {
-  colorMode.value = isDark.value ? 'light' : 'dark';
-};
 const mobileMenuOpen = ref(false);
 const auth = useAuthStore();
 const router = useRouter();
@@ -94,21 +89,9 @@ const navigateTo = (path: string) => {
           {{ isAuthenticated ? "Logout" : "Login" }}
         </Button>
         
-        <Button 
-          variant="ghost" 
-          class="w-full justify-start cursor-pointer"
-          @click="toggleDark"
-        >
-          <SunIcon
-            v-if="isDark"
-            class="h-5 w-5 mr-2"
-          />
-          <MoonIcon
-            v-else
-            class="h-5 w-5 mr-2"
-          />
-          {{ isDark ? "Light" : "Dark" }}
-        </Button>
+        <div class="px-4">
+          <ThemeToggle />
+        </div>
       </nav>
     </SheetContent>
   </Sheet>
@@ -145,22 +128,7 @@ const navigateTo = (path: string) => {
           </NavigationMenuItem>
           
           <NavigationMenuItem>
-            <Button
-              variant="ghost"
-              size="icon"
-              class="cursor-pointer"
-              @click="toggleDark"
-            >
-              <SunIcon
-                v-if="isDark"
-                class="h-5 w-5"
-              />
-              <MoonIcon
-                v-else
-                class="h-5 w-5"
-              />
-              <span class="sr-only">Toggle theme</span>
-            </Button>
+            <ThemeToggle />
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

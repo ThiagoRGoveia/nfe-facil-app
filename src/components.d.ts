@@ -120,6 +120,8 @@ declare module 'vue' {
     TableHead: typeof import('./components/ui/table/TableHead.vue')['default']
     TableHeader: typeof import('./components/ui/table/TableHeader.vue')['default']
     TableRow: typeof import('./components/ui/table/TableRow.vue')['default']
+    ThemeProvider: typeof import('./components/ui/theme-provider/theme-provider.vue')['default']
+    ThemeToggle: typeof import('./components/ui/theme-toggle/theme-toggle.vue')['default']
     Toast: typeof import('./components/ui/toast/Toast.vue')['default']
     ToastAction: typeof import('./components/ui/toast/ToastAction.vue')['default']
     ToastClose: typeof import('./components/ui/toast/ToastClose.vue')['default']
