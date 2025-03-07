@@ -1,29 +1,19 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, watch } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { PROCESS_BATCH_SYNC } from "@/graphql/private";
 import ConversionForm from "./ConversionForm.vue";
-import ConversionResult from "./ConversionResult.vue";
 import { Loader2 } from "lucide-vue-next";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { FileFormat } from "@/graphql/generated/graphql";
+import { useRouter } from "vue-router";
+import { Button } from "@/components/ui/button";
 
-interface DownloadLinks {
-  json?: string | null;
-  csv?: string | null;
-  excel?: string | null;
-}
-
-interface FileError {
-  fileName: string;
-  error: string;
-}
-
+const router = useRouter();
 const loading = ref(false);
 const processing = ref(false);
 const error = ref("");
-const fileErrors = ref<FileError[]>([]);
-const downloadLinks = ref<DownloadLinks>({});
+const batchId = ref<string | null>(null);
 const { toast } = useToast();
 
 // Watch for error changes and show a toast when there's an error
@@ -44,8 +34,7 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
     processing.value = true;
     loading.value = true;
     error.value = "";
-    fileErrors.value = [];
-    downloadLinks.value = {};
+    batchId.value = null;
 
     const result = await processFiles({
       variables: {
@@ -57,17 +46,8 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
     });
 
     if (result?.data?.processBatchSync) {
-      downloadLinks.value = {
-        json: result.data.processBatchSync.jsonResults,
-        csv: result.data.processBatchSync.csvResults,
-        excel: result.data.processBatchSync.excelResults,
-      };
-      
-      // Store file errors if they exist
-      if (result.data.processBatchSync.errors && 
-          result.data.processBatchSync.errors.length > 0) {
-        fileErrors.value = result.data.processBatchSync.errors;
-      }
+      // Store the batch ID for tracking
+      batchId.value = result.data.processBatchSync.id;
     }
   } catch (e) {
     error.value = e instanceof Error ? e.message : "Tivemos um problema, tente novamente mais tarde";
@@ -76,15 +56,18 @@ const handleSubmit = async (data: { files: File[]; formats: FileFormat[] }) => {
   }
 };
 
-const handleDownloadError = (message: string) => {
-  error.value = message;
-};
-
 const handleReset = () => {
   processing.value = false;
-  downloadLinks.value = {};
-  fileErrors.value = [];
+  batchId.value = null;
   error.value = "";
+};
+
+const handleTrackResults = () => {
+  if (batchId.value) {
+    router.push({
+      path: `/files/${batchId.value}`,
+    });
+  }
 };
 </script>
 
@@ -93,21 +76,41 @@ const handleReset = () => {
     <!-- Show ConversionForm if not processing -->
     <ConversionForm
       v-if="!processing"
-      title="Conversão Privada de Arquivos"
+      title="Extrair dados de Notas Fiscais em PDF"
       @submit="handleSubmit"
     />
     
-    <!-- Show results after processing -->
-    <ConversionResult 
+    <!-- Show processing message after submission -->
+    <div 
       v-else
-      :downloadLinks="downloadLinks"
-      :errors="fileErrors"
-      :errorMessage="error"
-      @error="handleDownloadError"
-      @reset="handleReset"
-    />
+      class="flex flex-col items-center justify-center h-full p-6 text-center"
+    >
+      <div class="mb-4">
+        <Loader2 class="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+        <h3 class="text-xl font-semibold mb-2">Extração em andamento</h3>
+        <p class="text-muted-foreground mb-6">
+          Seus arquivos estão sendo processados. Você pode acompanhar o status ou enviar novos arquivos.
+        </p>
+      </div>
+      
+      <div class="flex gap-4">
+        <Button 
+          variant="default" 
+          @click="handleTrackResults"
+        >
+          Acompanhar resultados
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          @click="handleReset"
+        >
+          Enviar novos arquivos
+        </Button>
+      </div>
+    </div>
 
-    <!-- Loading overlay -->
+    <!-- Loading overlay only for initial submission -->
     <div 
       v-if="loading" 
       class="absolute inset-0 bg-background/80 flex items-center justify-center"

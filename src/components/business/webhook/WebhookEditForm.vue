@@ -42,6 +42,7 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { ApolloError } from '@apollo/client/core';
+import { WebhookEvent } from '@/graphql/generated/graphql';
 
 const props = defineProps<{
   show: boolean;
@@ -58,10 +59,10 @@ const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, 'Nome é obrigatório'),
     url: z.string().url('URL inválida').min(1, 'URL é obrigatória'),
-    authType: z.enum(['NONE', 'BASIC', 'OAUTH2'] as const),
-    events: z.array(z.enum(['COMPANY_CREATED', 'INVOICE_CREATED', 'INVOICE_CANCELLED', 'INVOICE_ERROR'] as const)).min(1, 'Selecione pelo menos um evento'),
+    authType: z.enum(authTypes.map(type => type.value) as [string, ...string[]]),
+    events: z.array(z.enum(webhookEvents.map(event => event.value) as [string, ...string[]])).min(1, 'Selecione pelo menos um evento'),
     active: z.boolean(),
-    headers: z.any().optional(),
+    headers: z.record(z.string()).optional(),
     authConfig: z.any().optional()
   })
 );
@@ -73,7 +74,7 @@ const { toast } = useToast();
 const isSubmitting = ref(false);
 
 // Edit form
-const editForm = useForm<EditWebhookFormValues>({
+const form = useForm<EditWebhookFormValues>({
   validationSchema: formSchema,
   initialValues: {
     name: props.webhook?.name || '',
@@ -90,13 +91,13 @@ const editForm = useForm<EditWebhookFormValues>({
 const { mutate: updateWebhook } = useMutation(UPDATE_WEBHOOK);
 
 // Handle auth type change in edit form
-watch(() => editForm.values.authType, (newAuthType) => {
+watch(() => form.values.authType, (newAuthType) => {
   if (newAuthType === 'BASIC') {
-    editForm.setFieldValue('authConfig', { username: '', password: '' });
+    form.setFieldValue('authConfig', { username: '', password: '' });
   } else if (newAuthType === 'OAUTH2') {
-    editForm.setFieldValue('authConfig', { clientId: '', clientSecret: '', tokenUrl: '' });
+    form.setFieldValue('authConfig', { clientId: '', clientSecret: '', tokenUrl: '' });
   } else {
-    editForm.setFieldValue('authConfig', undefined);
+    form.setFieldValue('authConfig', undefined);
   }
 });
 
@@ -121,13 +122,13 @@ const handleUpdateWebhookCompleted = () => {
 };
 
 // Edit form submission
-const handleEditSubmit = async (values: EditWebhookFormValues) => {
+const onSubmit = form.handleSubmit(async (values) => {
   isSubmitting.value = true;
   try {
-    if (!props.webhook) return;
+    if (!props.webhook) return Promise.resolve();
     
+    const id = props.webhook.id;
     const input = {
-      id: props.webhook.id,
       name: values.name,
       url: values.url,
       authType: values.authType,
@@ -138,20 +139,37 @@ const handleEditSubmit = async (values: EditWebhookFormValues) => {
     };
 
     await updateWebhook({
-      variables: { input },
+      id,
+      input,
       onCompleted: handleUpdateWebhookCompleted,
       onError: handleUpdateWebhookError
     });
+    emit('update:show', false);
+    isSubmitting.value = false;
+    form.resetForm();
   } catch (error) {
     handleUpdateWebhookError(error as ApolloError);
+    return Promise.resolve();
   }
-};
+});
 
 // Computed property for dialog visibility
 const dialogOpen = computed({
   get: () => props.show,
   set: (value) => emit('update:show', value)
 });
+
+const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') => {
+  if (checked === 'indeterminate') {
+    return;
+  }
+  const currentEvents = form.values.events ?? [];
+  if (checked) {
+    form.setFieldValue('events', [...currentEvents, event]);
+  } else {
+    form.setFieldValue('events', currentEvents.filter(e => e !== event));
+  }
+};
 
 // Initialize form values when webhook changes
 watch(() => props.webhook, (newWebhook) => {
@@ -171,7 +189,7 @@ watch(() => props.webhook, (newWebhook) => {
       };
     }
     
-    editForm.resetForm({
+    form.resetForm({
       values: {
         name: newWebhook.name,
         url: newWebhook.url,
@@ -196,57 +214,50 @@ watch(() => props.webhook, (newWebhook) => {
         </DialogDescription>
       </DialogHeader>
       
-      <Form
-        v-slot="{ errors }"
-        :validation-schema="formSchema"
-        as="form"
-        @submit="editForm.handleSubmit(handleEditSubmit)"
-      >
+      <form @submit="onSubmit">
         <div class="grid gap-4 py-4">
           <FormField 
+            v-slot="{ field }"
             name="name"
-            :validate-on-input="true"
           >
             <FormItem>
               <FormLabel>Nome</FormLabel>
               <FormControl>
                 <Input
-                  v-model="editForm.values.name"
+                  v-bind="field"
                   placeholder="Nome do webhook"
                 />
               </FormControl>
-              <FormMessage v-if="errors.name">
-                {{ errors.name }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
           
           <FormField 
+            v-slot="{ field }"
             name="url"
-            :validate-on-input="true"
           >
             <FormItem>
               <FormLabel>URL</FormLabel>
               <FormControl>
                 <Input
-                  v-model="editForm.values.url"
+                  v-bind="field"
                   placeholder="https://seu-endpoint.com/webhook"
                 />
               </FormControl>
-              <FormMessage v-if="errors.url">
-                {{ errors.url }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
           
           <FormField 
+            v-slot
             name="authType"
           >
             <FormItem>
               <FormLabel>Tipo de Autenticação</FormLabel>
               <FormControl>
                 <Select 
-                  v-model="editForm.values.authType"
+                  :model-value="form.values.authType"
+                  @update:model-value="(value) => form.setFieldValue('authType', value as 'NONE' | 'BASIC' | 'OAUTH2')"
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o tipo de autenticação" />
@@ -262,15 +273,13 @@ watch(() => props.webhook, (newWebhook) => {
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage v-if="errors.authType">
-                {{ errors.authType }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
           
           <!-- Basic Auth Config - Edit Form -->
           <div
-            v-if="editForm.values.authType === 'BASIC'"
+            v-if="form.values.authType === 'BASIC'"
             class="space-y-4 border p-4 rounded-md"
           >
             <h4 class="font-medium">
@@ -278,46 +287,44 @@ watch(() => props.webhook, (newWebhook) => {
             </h4>
             
             <FormField 
+              v-slot
               name="authConfig.username"
             >
               <FormItem>
                 <FormLabel>Usuário</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(editForm.values.authConfig as BasicAuthConfig)?.username || ''" 
+                    :value="(form.values.authConfig as BasicAuthConfig)?.username || ''" 
                     placeholder="Seu usuário"
-                    @input="(e: Event) => editForm.setFieldValue('authConfig.username', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.username', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
             
             <FormField 
+              v-slot
               name="authConfig.password"
             >
               <FormItem>
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(editForm.values.authConfig as BasicAuthConfig)?.password || ''" 
+                    :value="(form.values.authConfig as BasicAuthConfig)?.password || ''" 
                     type="password"
                     placeholder="Sua senha" 
-                    @input="(e: Event) => editForm.setFieldValue('authConfig.password', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.password', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
           </div>
           
           <!-- OAuth2 Config - Edit Form -->
           <div
-            v-if="editForm.values.authType === 'OAUTH2'"
+            v-if="form.values.authType === 'OAUTH2'"
             class="space-y-4 border p-4 rounded-md"
           >
             <h4 class="font-medium">
@@ -325,62 +332,60 @@ watch(() => props.webhook, (newWebhook) => {
             </h4>
             
             <FormField 
+              v-slot
               name="authConfig.clientId"
             >
               <FormItem>
                 <FormLabel>Client ID</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(editForm.values.authConfig as OAuth2Config)?.clientId || ''" 
+                    :value="(form.values.authConfig as OAuth2Config)?.clientId || ''" 
                     placeholder="Client ID"
-                    @input="(e: Event) => editForm.setFieldValue('authConfig.clientId', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.clientId', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
             
             <FormField 
+              v-slot
               name="authConfig.clientSecret"
             >
               <FormItem>
                 <FormLabel>Client Secret</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(editForm.values.authConfig as OAuth2Config)?.clientSecret || ''" 
+                    :value="(form.values.authConfig as OAuth2Config)?.clientSecret || ''" 
                     type="password"
                     placeholder="Client Secret" 
-                    @input="(e: Event) => editForm.setFieldValue('authConfig.clientSecret', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.clientSecret', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
             
             <FormField 
+              v-slot
               name="authConfig.tokenUrl"
             >
               <FormItem>
                 <FormLabel>URL do Token</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(editForm.values.authConfig as OAuth2Config)?.tokenUrl || ''" 
+                    :value="(form.values.authConfig as OAuth2Config)?.tokenUrl || ''" 
                     placeholder="https://auth.exemplo.com/token"
-                    @input="(e: Event) => editForm.setFieldValue('authConfig.tokenUrl', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.tokenUrl', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
           </div>
           
           <FormField 
+            v-slot
             name="events"
           >
             <FormItem>
@@ -394,12 +399,8 @@ watch(() => props.webhook, (newWebhook) => {
                   <Checkbox 
                     :id="`edit-event-${event.value}`"
                     :value="event.value"
-                    :checked="editForm.values.events?.includes(event.value)"
-                    @update:checked="
-                      editForm.values.events = editForm.values.events?.includes(event.value)
-                        ? editForm.values.events?.filter(e => e !== event.value)
-                        : [...(editForm.values.events || []), event.value]
-                    "
+                    :model-value="form.values.events?.includes(event.value as any)"
+                    @update:model-value="(checked: boolean | 'indeterminate') => toggleEvent(event.value, checked)"
                   />
                   <label 
                     :for="`edit-event-${event.value}`"
@@ -409,20 +410,24 @@ watch(() => props.webhook, (newWebhook) => {
                   </label>
                 </div>
               </div>
-              <FormMessage v-if="errors.events">
-                {{ errors.events }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
           
           <FormField 
+            v-slot
             name="active"
           >
             <FormItem class="flex flex-row items-start space-x-3 space-y-0 p-2 border rounded-md">
               <FormControl>
                 <Checkbox 
                   :id="'edit-active-status'"
-                  v-model="editForm.values.active"
+                  :model-value="form.values.active"
+                  @update:model-value="(checked) => {
+                    if (checked !== 'indeterminate') {
+                      form.setFieldValue('active', checked);
+                    }
+                  }"
                 />
               </FormControl>
               <div class="space-y-1 leading-none">
@@ -433,9 +438,7 @@ watch(() => props.webhook, (newWebhook) => {
                   Determina se o webhook está ativo e receberá notificações.
                 </p>
               </div>
-              <FormMessage v-if="errors.active">
-                {{ errors.active }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
         </div>
@@ -460,7 +463,7 @@ watch(() => props.webhook, (newWebhook) => {
             Salvar Alterações
           </Button>
         </DialogFooter>
-      </Form>
+      </form>
     </DialogContent>
   </Dialog>
 </template> 

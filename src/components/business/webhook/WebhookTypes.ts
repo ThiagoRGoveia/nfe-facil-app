@@ -1,3 +1,5 @@
+import { WebhookEvent } from "@/graphql/generated/graphql";
+
 export interface WebhookItem {
   id: string;
   name: string;
@@ -41,11 +43,10 @@ export type EditWebhookFormValues = WebhookFormValues & {
   active: boolean;
 };
 
-export const webhookEvents = [
-  { value: 'COMPANY_CREATED', label: 'Empresa Criada' },
-  { value: 'INVOICE_CREATED', label: 'Nota Fiscal Criada' },
-  { value: 'INVOICE_CANCELLED', label: 'Nota Fiscal Cancelada' },
-  { value: 'INVOICE_ERROR', label: 'Erro na Nota Fiscal' },
+export const webhookEvents: { value: WebhookEvent, label: string }[] = [
+  { value: 'BATCH_FINISHED', label: 'Batch Finalizado' },
+  { value: 'DOCUMENT_FAILED', label: 'Documento Falhou' },
+  { value: 'DOCUMENT_PROCESSED', label: 'Documento Processado' },
 ];
 
 export const authTypes = [

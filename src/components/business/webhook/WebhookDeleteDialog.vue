@@ -62,10 +62,11 @@ const handleDeleteWebhook = async () => {
   isSubmitting.value = true;
   try {
     await deleteWebhook({ 
-      variables: { id: props.webhook.id },
+      id: props.webhook.id,
       onCompleted: handleDeleteWebhookCompleted,
       onError: handleDeleteWebhookError
     });
+    emit('update:show', false);
   } catch (error) {
     handleDeleteWebhookError(error as ApolloError);
   }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { CREATE_WEBHOOK } from '@/graphql/webhooks';
 import type { 
@@ -40,6 +40,8 @@ import { useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
 import * as z from 'zod';
 import { ApolloError } from '@apollo/client/core';
+import { WebhookEvent } from '@/graphql/generated/graphql';
+import WebhookHeadersForm from './WebhookHeadersForm.vue';
 
 const props = defineProps<{
   show: boolean;
@@ -55,10 +57,9 @@ const formSchema = toTypedSchema(
   z.object({
     name: z.string().min(1, 'Nome é obrigatório'),
     url: z.string().url('URL inválida').min(1, 'URL é obrigatória'),
-    authType: z.enum(['NONE', 'BASIC', 'OAUTH2'] as const),
-    events: z.array(z.enum(['COMPANY_CREATED', 'INVOICE_CREATED', 'INVOICE_CANCELLED', 'INVOICE_ERROR'] as const)).min(1, 'Selecione pelo menos um evento'),
-    active: z.boolean(),
-    headers: z.any().optional(),
+    authType: z.enum(authTypes.map(type => type.value) as [string, ...string[]]),
+    events: z.array(z.enum(webhookEvents.map(event => event.value) as [string, ...string[]])).min(1, 'Selecione pelo menos um evento'),
+    headers: z.record(z.string()).optional(),
     authConfig: z.any().optional()
   })
 );
@@ -70,7 +71,7 @@ const { toast } = useToast();
 const isSubmitting = ref(false);
 
 // Create form
-const createForm = useForm<WebhookFormValues>({
+const form = useForm<WebhookFormValues>({
   validationSchema: formSchema,
   initialValues: {
     name: '',
@@ -86,13 +87,13 @@ const createForm = useForm<WebhookFormValues>({
 const { mutate: createWebhook } = useMutation(CREATE_WEBHOOK);
 
 // Handle auth type change in create form
-watch(() => createForm.values.authType, (newAuthType) => {
+watch(() => form.values.authType, (newAuthType) => {
   if (newAuthType === 'BASIC') {
-    createForm.setFieldValue('authConfig', { username: '', password: '' });
+    form.setFieldValue('authConfig', { username: '', password: '' });
   } else if (newAuthType === 'OAUTH2') {
-    createForm.setFieldValue('authConfig', { clientId: '', clientSecret: '', tokenUrl: '' });
+    form.setFieldValue('authConfig', { clientId: '', clientSecret: '', tokenUrl: '' });
   } else {
-    createForm.setFieldValue('authConfig', undefined);
+    form.setFieldValue('authConfig', undefined);
   }
 });
 
@@ -104,6 +105,7 @@ const handleCreateWebhookError = (error: ApolloError) => {
     variant: "destructive",
   });
   isSubmitting.value = false;
+  
 };
 
 const handleCreateWebhookCompleted = () => {
@@ -114,11 +116,11 @@ const handleCreateWebhookCompleted = () => {
   emit('update:show', false);
   isSubmitting.value = false;
   emit('created');
-  createForm.resetForm();
+  form.resetForm();
 };
 
 // Create form submission
-const handleCreateSubmit = async (values: WebhookFormValues) => {
+const onSubmit = form.handleSubmit(async (values) => {
   isSubmitting.value = true;
   try {
     const input = {
@@ -131,20 +133,35 @@ const handleCreateSubmit = async (values: WebhookFormValues) => {
     };
 
     await createWebhook({
-      variables: { input },
+      input,
       onCompleted: handleCreateWebhookCompleted,
       onError: handleCreateWebhookError
     });
+    form.resetForm();
+    emit('update:show', false);
   } catch (error) {
     handleCreateWebhookError(error as ApolloError);
+    return Promise.resolve();
   }
-};
+});
 
 // Computed property for dialog visibility
 const dialogOpen = computed({
   get: () => props.show,
   set: (value) => emit('update:show', value)
 });
+
+const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') => {
+  if (checked === 'indeterminate') {
+    return;
+  }
+  const currentEvents = form.values.events ?? [];
+  if (checked) {
+    form.setFieldValue('events', [...currentEvents, event]);
+  } else {
+    form.setFieldValue('events', currentEvents.filter(e => e !== event));
+  }
+};
 </script>
 
 <template>
@@ -157,57 +174,50 @@ const dialogOpen = computed({
         </DialogDescription>
       </DialogHeader>
       
-      <Form
-        v-slot="{ errors }"
-        :validation-schema="formSchema"
-        as="form"
-        @submit="createForm.handleSubmit(handleCreateSubmit)"
-      >
+      <form @submit="onSubmit">
         <div class="grid gap-4 py-4">
           <FormField 
+            v-slot="{ field }"
             name="name"
-            :validate-on-input="true"
           >
             <FormItem>
               <FormLabel>Nome</FormLabel>
               <FormControl>
                 <Input
-                  v-model="createForm.values.name"
+                  v-bind="field"
                   placeholder="Nome do webhook"
                 />
               </FormControl>
-              <FormMessage v-if="errors.name">
-                {{ errors.name }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
           
           <FormField 
+            v-slot="{ field }"
             name="url"
-            :validate-on-input="true"
           >
             <FormItem>
               <FormLabel>URL</FormLabel>
               <FormControl>
                 <Input
-                  v-model="createForm.values.url"
+                  v-bind="field"
                   placeholder="https://seu-endpoint.com/webhook"
                 />
               </FormControl>
-              <FormMessage v-if="errors.url">
-                {{ errors.url }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
           
           <FormField 
+            v-slot
             name="authType"
           >
             <FormItem>
               <FormLabel>Tipo de Autenticação</FormLabel>
               <FormControl>
                 <Select 
-                  v-model="createForm.values.authType"
+                  :model-value="form.values.authType"
+                  @update:model-value="(value) => form.setFieldValue('authType', value as 'NONE' | 'BASIC' | 'OAUTH2')"
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o tipo de autenticação" />
@@ -223,15 +233,13 @@ const dialogOpen = computed({
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage v-if="errors.authType">
-                {{ errors.authType }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
           
           <!-- Basic Auth Config - Create Form -->
           <div
-            v-if="createForm.values.authType === 'BASIC'"
+            v-if="form.values.authType === 'BASIC'"
             class="space-y-4 border p-4 rounded-md"
           >
             <h4 class="font-medium">
@@ -239,46 +247,44 @@ const dialogOpen = computed({
             </h4>
             
             <FormField 
+              v-slot
               name="authConfig.username"
             >
               <FormItem>
                 <FormLabel>Usuário</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(createForm.values.authConfig as BasicAuthConfig)?.username || ''" 
+                    :value="(form.values.authConfig as BasicAuthConfig)?.username || ''" 
                     placeholder="Seu usuário"
-                    @input="(e: Event) => createForm.setFieldValue('authConfig.username', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.username', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
             
             <FormField 
+              v-slot="{ field }"
               name="authConfig.password"
             >
               <FormItem>
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(createForm.values.authConfig as BasicAuthConfig)?.password || ''" 
+                    :value="(form.values.authConfig as BasicAuthConfig)?.password || ''" 
                     type="password"
                     placeholder="Sua senha" 
-                    @input="(e: Event) => createForm.setFieldValue('authConfig.password', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.password', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
           </div>
           
           <!-- OAuth2 Config - Create Form -->
           <div
-            v-if="createForm.values.authType === 'OAUTH2'"
+            v-if="form.values.authType === 'OAUTH2'"
             class="space-y-4 border p-4 rounded-md"
           >
             <h4 class="font-medium">
@@ -286,62 +292,69 @@ const dialogOpen = computed({
             </h4>
             
             <FormField 
+              v-slot="{ field }"
               name="authConfig.clientId"
             >
               <FormItem>
                 <FormLabel>Client ID</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(createForm.values.authConfig as OAuth2Config)?.clientId || ''" 
+                    :value="(form.values.authConfig as OAuth2Config)?.clientId || ''" 
                     placeholder="Client ID"
-                    @input="(e: Event) => createForm.setFieldValue('authConfig.clientId', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.clientId', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
             
             <FormField 
+              v-slot="{ field }"
               name="authConfig.clientSecret"
             >
               <FormItem>
                 <FormLabel>Client Secret</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(createForm.values.authConfig as OAuth2Config)?.clientSecret || ''" 
+                    :value="(form.values.authConfig as OAuth2Config)?.clientSecret || ''" 
                     type="password"
                     placeholder="Client Secret" 
-                    @input="(e: Event) => createForm.setFieldValue('authConfig.clientSecret', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.clientSecret', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
             
             <FormField 
+              v-slot="{ field }"
               name="authConfig.tokenUrl"
             >
               <FormItem>
                 <FormLabel>URL do Token</FormLabel>
                 <FormControl>
                   <Input 
-                    :value="(createForm.values.authConfig as OAuth2Config)?.tokenUrl || ''" 
+                    :value="(form.values.authConfig as OAuth2Config)?.tokenUrl || ''" 
                     placeholder="https://auth.exemplo.com/token"
-                    @input="(e: Event) => createForm.setFieldValue('authConfig.tokenUrl', (e.target as HTMLInputElement).value)" 
+                    @input="(e: Event) => form.setFieldValue('authConfig.tokenUrl', (e.target as HTMLInputElement).value)" 
                   />
                 </FormControl>
-                <FormMessage v-if="errors.authConfig">
-                  {{ errors.authConfig }}
-                </FormMessage>
+                <FormMessage />
               </FormItem>
             </FormField>
           </div>
           
+          <!-- HTTP Headers Section -->
+          <div class="space-y-2">
+            <WebhookHeadersForm
+              name="headers"
+              :model-value="form.values.headers"
+              @update:model-value="value => form.setFieldValue('headers', value)"
+            />
+          </div>
+          
           <FormField 
+            v-slot="{ field }"
             name="events"
           >
             <FormItem>
@@ -355,11 +368,13 @@ const dialogOpen = computed({
                   <Checkbox 
                     :id="`create-event-${event.value}`"
                     :value="event.value"
-                    :checked="createForm.values.events?.includes(event.value)"
+                    :checked="form.values.events?.includes(event.value as any)"
+                    :model-value="form.values.events?.includes(event.value as any)"
+                    @update:model-value="(checked: boolean | 'indeterminate') => toggleEvent(event.value, checked)"
                     @update:checked="
-                      createForm.values.events = createForm.values.events?.includes(event.value)
-                        ? createForm.values.events?.filter(e => e !== event.value)
-                        : [...(createForm.values.events || []), event.value]
+                      form.values.events = form.values.events?.includes(event.value as any)
+                        ? form.values.events?.filter(e => e !== event.value as any)
+                        : [...(form.values.events || []), event.value as 'COMPANY_CREATED' | 'INVOICE_CREATED' | 'INVOICE_CANCELLED' | 'INVOICE_ERROR']
                     "
                   />
                   <label 
@@ -370,9 +385,7 @@ const dialogOpen = computed({
                   </label>
                 </div>
               </div>
-              <FormMessage v-if="errors.events">
-                {{ errors.events }}
-              </FormMessage>
+              <FormMessage />
             </FormItem>
           </FormField>
         </div>
@@ -397,7 +410,7 @@ const dialogOpen = computed({
             Criar Webhook
           </Button>
         </DialogFooter>
-      </Form>
+      </form>
     </DialogContent>
   </Dialog>
 </template> 

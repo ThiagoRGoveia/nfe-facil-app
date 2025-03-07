@@ -39,7 +39,7 @@ const isEditing = ref(false);
 
       <div class="grid gap-6 md:grid-cols-2">
         <div
-          v-if="auth.user.isSocial"
+          v-if="!auth.user.isSocial"
           class="flex h-full"
         >
           <Card class="h-full w-full">

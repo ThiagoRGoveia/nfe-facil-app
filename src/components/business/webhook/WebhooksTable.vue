@@ -41,6 +41,7 @@ import {
   Plus,
   Pencil,
   Trash2,
+  X,
 } from 'lucide-vue-next';
 
 // Pagination state
@@ -58,6 +59,7 @@ const sortDirection = ref<'asc' | 'desc'>('desc');
 const showCreateDialog = ref(false);
 const showEditDialog = ref(false);
 const showDeleteDialog = ref(false);
+const showDetailDialog = ref(false);
 const selectedWebhook = ref<WebhookItem | null>(null);
 
 // Computed tableOptions for API call compatibility
@@ -104,6 +106,7 @@ const webhooksComputed = computed(() => {
 const totalItems = computed(() => result.value?.findAllWebhooks.total ?? 0);
 const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value));
 
+// Updated columns - removed URL and Events
 const columns = [
   {
     title: "Nome",
@@ -111,19 +114,9 @@ const columns = [
     sortable: true,
   },
   {
-    title: "URL",
-    key: "url",
-    sortable: true,
-  },
-  {
     title: "Status",
     key: "status",
     sortable: true,
-  },
-  {
-    title: "Eventos",
-    key: "events",
-    sortable: false,
   },
   {
     title: "Tipo de Autenticação",
@@ -153,6 +146,16 @@ const getStatusLabel = (status: WebhookStatus) => {
   }
 };
 
+// Get event badge variant based on event type
+const getEventBadgeVariant = (event: WebhookEvent) => {
+  switch(event) {
+    case 'BATCH_FINISHED' as WebhookEvent: return 'success';
+    case 'DOCUMENT_FAILED' as WebhookEvent: return 'destructive';
+    case 'DOCUMENT_PROCESSED' as WebhookEvent: return 'info';
+    default: return 'outline';
+  }
+};
+
 const getSortIcon = (columnKey: string) => {
   if (sortColumn.value !== columnKey) return ChevronsUpDown;
   return sortDirection.value === 'asc' ? ChevronUp : ChevronDown;
@@ -173,15 +176,23 @@ const handlePageChange = (page: number) => {
 };
 
 // Open edit dialog
-const openEditDialog = (item: WebhookItem) => {
+const openEditDialog = (item: WebhookItem, event: Event) => {
+  event.stopPropagation();
   selectedWebhook.value = item;
   showEditDialog.value = true;
 };
 
 // Open delete dialog
-const openDeleteDialog = (webhook: WebhookItem) => {
+const openDeleteDialog = (webhook: WebhookItem, event: Event) => {
+  event.stopPropagation();
   selectedWebhook.value = webhook;
   showDeleteDialog.value = true;
+};
+
+// Open detail dialog
+const openDetailDialog = (webhook: WebhookItem) => {
+  selectedWebhook.value = webhook;
+  showDetailDialog.value = true;
 };
 
 // Format events for display
@@ -192,6 +203,12 @@ const formatEvents = (events: WebhookEvent[]) => {
     const eventOption = webhookEvents.find(opt => opt.value === event);
     return eventOption?.label || event;
   }).join(', ');
+};
+
+// Get event label
+const getEventLabel = (event: WebhookEvent) => {
+  const eventOption = webhookEvents.find(opt => opt.value === event);
+  return eventOption?.label || event;
 };
 
 // Handle completed events from child components
@@ -264,13 +281,7 @@ onMounted(() => {
                 <Skeleton class="h-4 w-[120px]" />
               </TableCell>
               <TableCell>
-                <Skeleton class="h-4 w-[250px]" />
-              </TableCell>
-              <TableCell>
                 <Skeleton class="h-6 w-24" />
-              </TableCell>
-              <TableCell>
-                <Skeleton class="h-4 w-[120px]" />
               </TableCell>
               <TableCell>
                 <Skeleton class="h-4 w-[80px]" />
@@ -289,21 +300,14 @@ onMounted(() => {
             v-for="webhook in webhooksComputed"
             v-else-if="!loading" 
             :key="webhook.id" 
-            class="hover:bg-muted/50"
+            class="hover:bg-muted/50 cursor-pointer"
+            @click="openDetailDialog(webhook)"
           >
             <TableCell>{{ webhook.name }}</TableCell>
-            <TableCell class="max-w-md truncate">
-              {{ webhook.url }}
-            </TableCell>
             <TableCell>
               <Badge :variant="getBadgeVariant(webhook.status)">
                 {{ getStatusLabel(webhook.status) }}
               </Badge>
-            </TableCell>
-            <TableCell>
-              <span class="text-sm text-muted-foreground">
-                {{ formatEvents(webhook.events) }}
-              </span>
             </TableCell>
             <TableCell>{{ webhook.authType }}</TableCell>
             <TableCell>
@@ -312,7 +316,7 @@ onMounted(() => {
                   variant="outline" 
                   size="icon" 
                   class="rounded-full h-10 w-10"
-                  @click.stop="openEditDialog(webhook)"
+                  @click="openEditDialog(webhook, $event)"
                 >
                   <Pencil class="h-4 w-4" />
                 </Button>
@@ -320,7 +324,7 @@ onMounted(() => {
                   variant="destructive" 
                   size="icon" 
                   class="rounded-full h-10 w-10"
-                  @click.stop="openDeleteDialog(webhook)"
+                  @click="openDeleteDialog(webhook, $event)"
                 >
                   <Trash2 class="h-4 w-4" />
                 </Button>
@@ -401,6 +405,63 @@ onMounted(() => {
       :webhook="selectedWebhook"
       @deleted="handleWebhookDeleted"
     />
+
+    <!-- Webhook Detail Dialog -->
+    <div v-if="showDetailDialog && selectedWebhook" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="fixed inset-0 bg-background/80 backdrop-blur-sm" @click="showDetailDialog = false"></div>
+      <div class="z-50 grid w-full max-w-lg gap-4 bg-background p-6 shadow-lg border rounded-lg">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">Detalhes do Webhook</h2>
+          <Button variant="ghost" class="rounded-full h-8 w-8 p-0" @click="showDetailDialog = false">
+            <X class="h-4 w-4" />
+          </Button>
+        </div>
+        <div class="grid gap-2">
+          <div class="grid grid-cols-3 gap-4">
+            <div class="font-medium">Nome:</div>
+            <div class="col-span-2">{{ selectedWebhook.name }}</div>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="font-medium">URL:</div>
+            <div class="col-span-2 break-words">{{ selectedWebhook.url }}</div>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="font-medium">Status:</div>
+            <div class="col-span-2">
+              <Badge :variant="getBadgeVariant(selectedWebhook.status as WebhookStatus)">
+                {{ getStatusLabel(selectedWebhook.status as WebhookStatus) }}
+              </Badge>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="font-medium">Autenticação:</div>
+            <div class="col-span-2">{{ selectedWebhook.authType }}</div>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="font-medium">Eventos:</div>
+            <div class="col-span-2 flex flex-wrap gap-2">
+              <Badge 
+                v-for="event in selectedWebhook.events" 
+                :key="event" 
+                :variant="getEventBadgeVariant(event as WebhookEvent)"
+                class="mr-1 mb-1"
+              >
+                {{ getEventLabel(event as WebhookEvent) }}
+              </Badge>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end mt-4 gap-2">
+          <Button variant="outline" @click="showDetailDialog = false">Fechar</Button>
+          <Button 
+            variant="outline"
+            @click="openEditDialog(selectedWebhook, $event); showDetailDialog = false"
+          >
+            Editar
+          </Button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

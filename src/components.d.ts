@@ -124,6 +124,7 @@ declare module 'vue' {
     WebhookCreateForm: typeof import('./components/business/webhook/WebhookCreateForm.vue')['default']
     WebhookDeleteDialog: typeof import('./components/business/webhook/WebhookDeleteDialog.vue')['default']
     WebhookEditForm: typeof import('./components/business/webhook/WebhookEditForm.vue')['default']
+    WebhookHeadersForm: typeof import('./components/business/webhook/WebhookHeadersForm.vue')['default']
     WebhooksTable: typeof import('./components/business/webhook/WebhooksTable.vue')['default']
   }
 }

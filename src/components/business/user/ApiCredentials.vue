@@ -4,7 +4,7 @@ import { useMutation } from '@vue/apollo-composable';
 import { REFRESH_CLIENT_SECRET } from '@/graphql/user';
 import type { User } from '@/graphql/generated/graphql';
 import { Copy, Eye, EyeOff, RefreshCw, CheckCircle2 } from 'lucide-vue-next';
-import { FormField } from '@/components/ui/form';
+import { FormField, FormItem, FormLabel, FormControl, FormDescription, Form } from '@/components/ui/form';
 
 const props = defineProps<{
   user: User;
@@ -71,11 +71,11 @@ const maskedSecret = (secret: string) => {
 </script>
 
 <template>
-  <Form class="w-full">
+  <Form class="w-full" novalidate>
     <Card class="shadow-none border-0">
       <CardContent class="pt-6">
         <div class="space-y-4">
-          <FormField name="clientId">
+          <FormField name="client-id">
             <FormItem>
               <FormLabel for="client-id">
                 Client ID
@@ -109,7 +109,7 @@ const maskedSecret = (secret: string) => {
             </FormItem>
           </FormField>
           
-          <FormField name="clientSecret">
+          <FormField name="client-secret">
             <FormItem>
               <FormLabel for="client-secret">
                 Client Secret

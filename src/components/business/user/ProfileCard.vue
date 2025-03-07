@@ -32,14 +32,14 @@ const fullName = computed(() => `${props.user.name} ${props.user.surname}`);
           </div>
         </li>
 
-        <li class="flex items-start">
+        <!-- <li class="flex items-start">
           <Star class="h-5 w-5 text-primary mr-3 mt-0.5" />
           <div>
             <div class="font-medium">
               Plano
             </div>
           </div>
-        </li>
+        </li> -->
 
         <li class="flex items-start">
           <DollarSign class="h-5 w-5 text-primary mr-3 mt-0.5" />
