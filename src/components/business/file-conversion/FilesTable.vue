@@ -30,7 +30,22 @@ import {
   ChevronUp,
   ChevronsUpDown,
   Download,
+  Eye,
 } from 'lucide-vue-next';
+import {
+  Dialog,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogScrollContent,
+} from '@/components/ui/dialog';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '@/components/ui/card';
 
 interface TableOptions {
   page: number;
@@ -67,6 +82,11 @@ const skeletonRowCount = 10;
 // Sorting state
 const sortColumn = ref('createdAt');
 const sortDirection = ref<'asc' | 'desc'>('asc');
+
+// Dialog state
+const isDialogOpen = ref(false);
+const selectedFile = ref<FileItem | null>(null);
+const formattedJson = ref<string>('');
 
 // Computed tableOptions for API call compatibility
 const tableOptions = computed<TableOptions>(() => ({
@@ -160,6 +180,30 @@ const handleDownload = (event: Event, item: FileItem) => {
   console.log("Downloading file:", item.fileName);
 };
 
+const handleRowClick = (item: FileItem) => {
+  selectedFile.value = item;
+  
+  if (item.result) {
+    try {
+      // If result is already an object, stringify it with indentation
+      if (typeof item.result === 'object') {
+        formattedJson.value = JSON.stringify(item.result, null, 2);
+      } else {
+        // If it's a string, parse it and then stringify with indentation
+        const parsed = JSON.parse(String(item.result));
+        formattedJson.value = JSON.stringify(parsed, null, 2);
+      }
+    } catch (_error) {
+      // Fallback to raw result if parsing fails
+      formattedJson.value = String(item.result);
+    }
+  } else {
+    formattedJson.value = '';
+  }
+  
+  isDialogOpen.value = true;
+};
+
 const handlePageChange = (page: number) => {
   currentPage.value = page;
 };
@@ -244,7 +288,8 @@ onMounted(() => {
           v-for="item in files"
           v-else-if="!loading" 
           :key="item.id"
-          class="hover:bg-muted/50"
+          class="hover:bg-muted/50 cursor-pointer"
+          @click="handleRowClick(item)"
         >
           <TableCell>{{ item.fileName }}</TableCell>
           <TableCell class="text-center">
@@ -262,7 +307,15 @@ onMounted(() => {
               v-if="item.error"
               class="text-destructive"
             >{{ item.error }}</span>
-            <span v-else-if="item.result">{{ JSON.stringify(item.result) }}</span>
+            <span
+              v-else-if="item.result"
+              class="flex justify-center"
+            >
+              <Eye
+                class="h-5 w-5 text-muted-foreground hover:text-foreground"
+                title="Visualizar resultado completo"
+              />
+            </span>
             <span v-else>-</span>
           </TableCell>
           <TableCell class="text-center">
@@ -324,6 +377,46 @@ onMounted(() => {
         </PaginationList>
       </Pagination>
     </div>
+
+    <!-- Results Dialog -->
+    <Dialog v-model:open="isDialogOpen">
+      <DialogScrollContent class="sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>Detalhes do Resultado</DialogTitle>
+          <DialogDescription v-if="selectedFile">
+            {{ selectedFile.fileName }}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <Card v-if="selectedFile && selectedFile.result">
+          <CardHeader>
+            <CardTitle>Resultado</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="overflow-auto max-h-[400px]">
+              <pre class="text-sm font-mono whitespace-pre-wrap break-words">{{ formattedJson }}</pre>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card v-else-if="selectedFile && selectedFile.error">
+          <CardHeader>
+            <CardTitle>Erro</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p class="text-destructive">
+              {{ selectedFile.error }}
+            </p>
+          </CardContent>
+        </Card>
+        
+        <DialogFooter>
+          <Button @click="isDialogOpen = false">
+            Fechar
+          </Button>
+        </DialogFooter>
+      </DialogScrollContent>
+    </Dialog>
   </div>
 </template>
 

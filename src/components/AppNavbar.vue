@@ -36,7 +36,7 @@ const handleAuth = () => {
 const navItems = computed(() => [
   ...(isAuthenticated.value
     ? [
-        { title: "Dashboard", icon: "layout-dashboard", to: "/dashboard" },
+        { title: "Dashboard", icon: "layout-dashboard", to: "/" },
         { title: "Histórico", icon: "history", to: "/history" },
         { title: "Perfil", icon: "user", to: "/profile" },
       ]

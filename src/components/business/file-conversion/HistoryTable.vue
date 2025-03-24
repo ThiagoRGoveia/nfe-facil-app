@@ -142,9 +142,6 @@ const getBadgeVariant = (status: BatchStatus) => {
   switch(status) {
     case 'COMPLETED': return 'secondary';
     case 'FAILED': return 'destructive';
-    case 'PROCESSING': return 'default';
-    case 'CANCELLED': return 'destructive';
-    case 'CREATED': return 'default';
     default: return 'default';
   }
 };
