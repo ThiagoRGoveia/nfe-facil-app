@@ -86,7 +86,7 @@ const navigateTo = (path: string) => {
           class="w-full justify-start cursor-pointer"
           @click="handleAuth"
         >
-          {{ isAuthenticated ? "Logout" : "Login" }}
+          {{ isAuthenticated ? "Sair" : "Entrar" }}
         </Button>
         
         <div class="px-4">
