@@ -32,31 +32,31 @@
   }
 
   .dark {
-    /* Carbon Dark Theme with Purple Accents */
+    /* Dark Theme with Light Theme Colors */
     --background: 0 0% 14%;
     --foreground: 0 0% 95%;
     --card: 0 0% 19%;
-    --card-foreground: 0 0% 70%;
+    --card-foreground: 0 0% 95%;
     --popover: 0 0% 12%;
     --popover-foreground: 0 0% 95%;
-    --primary: 285 95% 45%; /* Darker purple */
-    --primary-foreground: 0 0% 80%;
-    --secondary: 0 0% 25%;
-    --secondary-foreground: 0 0% 95%;
+    --primary: 25 95% 53%; /* Same as light theme */
+    --primary-foreground: 60 9.1% 97.8%;
+    --secondary: 182 85% 40%; /* Same as light theme */
+    --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 70%;
-    --accent: 275 80% 65%; /* Light purple */
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 85% 60%;
-    --destructive-foreground: 0 0% 95%;
+    --accent: 324 100% 60%; /* Same as light theme */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
     --border: 0 0% 25%;
     --input: 0 0% 25%;
-    --ring: 275 80% 65%; /* Light purple */
-    --chart-1: 275 80% 65%;
-    --chart-2: 200 85% 60%;
-    --chart-3: 335 80% 65%;
-    --chart-4: 45 90% 65%;
-    --chart-5: 150 80% 50%;
+    --ring: 25 95% 53%; /* Same as light theme */
+    --chart-1: 25 95% 53%; /* Same as light theme */
+    --chart-2: 182 85% 40%; /* Same as light theme */
+    --chart-3: 324 100% 60%; /* Same as light theme */
+    --chart-4: 55 96% 58%; /* Same as light theme */
+    --chart-5: 276 83% 58%; /* Same as light theme */
   }
 }
 

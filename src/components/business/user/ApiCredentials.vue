@@ -71,7 +71,10 @@ const maskedSecret = (secret: string) => {
 </script>
 
 <template>
-  <Form class="w-full" novalidate>
+  <Form
+    class="w-full"
+    novalidate
+  >
     <Card class="shadow-none border-0">
       <CardContent class="pt-6">
         <div class="space-y-4">
