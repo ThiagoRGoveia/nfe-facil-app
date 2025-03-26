@@ -2,11 +2,11 @@
 import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_USER_PASSWORD } from "@/graphql/user";
 import { useAuthStore } from "@/stores/auth";
-import { computed, ref, reactive, watch } from "vue";
+import { computed, ref, reactive } from "vue";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PasswordInput from "./PasswordInput.vue";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form";
 
 const auth = useAuthStore();
 const userId = computed(() => auth.user?.id);
@@ -21,19 +21,35 @@ const form = reactive({
   confirmPassword: "",
 });
 
-const isValid = ref(false);
-
-// Validate form
-watch([() => form.password, () => form.confirmPassword], ([password, confirmPassword]) => {
-  errors.password = !password ? "Password is required" : 
-                    password.length < 8 ? "Password must be at least 8 characters" : "";
+// Function to validate password
+const validateForm = () => {
+  // Password validation
+  if (!form.password) {
+    errors.password = "Password is required";
+    return false;
+  } else if (form.password.length < 8) {
+    errors.password = "Password must be at least 8 characters";
+    return false;
+  } else {
+    errors.password = "";
+  }
   
-  errors.confirmPassword = !confirmPassword ? "Confirmation is required" : 
-                           confirmPassword !== password ? "Passwords must match" : "";
+  // Confirm password validation
+  if (!form.confirmPassword) {
+    errors.confirmPassword = "Confirmation is required";
+    return false;
+  } else if (form.confirmPassword !== form.password) {
+    errors.confirmPassword = "Passwords must match";
+    return false;
+  } else {
+    errors.confirmPassword = "";
+  }
+  
+  return true;
+};
 
-  isValid.value = !errors.password && !errors.confirmPassword && 
-                  !!password && !!confirmPassword;
-}, { immediate: true });
+// Create a computed property that calls the validation function
+const isValid = computed(() => validateForm());
 
 const { mutate: updatePassword, onDone, onError } = useMutation(UPDATE_USER_PASSWORD);
 
@@ -65,7 +81,8 @@ const handleSubmit = () => {
 <template>
   <Form
     class="w-full"
-    @submit.prevent="handleSubmit"
+    novalidate
+    @submit="handleSubmit"
   >
     <Card class="shadow-none border-0">
       <CardContent class="pt-6">
@@ -78,10 +95,12 @@ const handleSubmit = () => {
                   id="password"
                   v-model="form.password"
                   required
-                  hint="A senha deve conter pelo menos 8 caracteres"
                 />
               </FormControl>
-              <FormMessage>{{ errors.password }}</FormMessage>
+              <FormMessage v-if="errors.password">
+                {{ errors.password }}
+              </FormMessage>
+              <FormDescription>A senha deve conter pelo menos 8 caracteres</FormDescription>
             </FormItem>
           </FormField>
 
@@ -95,7 +114,9 @@ const handleSubmit = () => {
                   required
                 />
               </FormControl>
-              <FormMessage>{{ errors.confirmPassword }}</FormMessage>
+              <FormMessage v-if="errors.confirmPassword">
+                {{ errors.confirmPassword }}
+              </FormMessage>
             </FormItem>
           </FormField>
 
