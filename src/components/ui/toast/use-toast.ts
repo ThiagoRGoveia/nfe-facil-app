@@ -121,7 +121,8 @@ function dispatch(action: Action) {
   }
 }
 
-function useToast() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function useToast(): any {
   return {
     toasts: computed(() => state.value.toasts),
     toast,

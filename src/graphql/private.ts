@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client/core';
 
-export const PROCESS_BATCH_SYNC = gql`
-  mutation ProcessBatchSync($input: CreateBatchInput!) {
-    processBatchSync(input: $input) {
+export const CREATE_BATCH = gql`
+  mutation createBatchProcess($input: CreateBatchInput!) {
+    createBatchProcess(input: $input) {
       id
     }
   }

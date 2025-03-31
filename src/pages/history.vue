@@ -9,7 +9,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
-import { useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
 
 interface BatchProcess {
@@ -20,7 +19,6 @@ interface BatchProcess {
   createdAt: string;
 }
 
-const router = useRouter();
 const selectedProcess = ref<BatchProcess | null>(null);
 
 const handleRowClick = (item: BatchProcess) => {
@@ -35,7 +33,9 @@ const handleRowClick = (item: BatchProcess) => {
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink as-child>
-            <RouterLink to="/dashboard">Dashboard</RouterLink>
+            <RouterLink to="/dashboard">
+              Dashboard
+            </RouterLink>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />

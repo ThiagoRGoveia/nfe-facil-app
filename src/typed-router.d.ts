@@ -22,11 +22,7 @@ declare module 'vue-router/auto-routes' {
     '/api-doc': RouteRecordInfo<'/api-doc', '/api-doc', Record<never, never>, Record<never, never>>,
     '/files/[id]': RouteRecordInfo<'/files/[id]', '/files/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/history': RouteRecordInfo<'/history', '/history', Record<never, never>, Record<never, never>>,
+    '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/profile': RouteRecordInfo<'/profile', '/profile', Record<never, never>, Record<never, never>>,
-    '/public': RouteRecordInfo<'/public', '/public', Record<never, never>, Record<never, never>>,
-    '/test/': RouteRecordInfo<'/test/', '/test', Record<never, never>, Record<never, never>>,
-    '/test/combined-workflow': RouteRecordInfo<'/test/combined-workflow', '/test/combined-workflow', Record<never, never>, Record<never, never>>,
-    '/test/download-cards': RouteRecordInfo<'/test/download-cards', '/test/download-cards', Record<never, never>, Record<never, never>>,
-    '/test/file-errors': RouteRecordInfo<'/test/file-errors', '/test/file-errors', Record<never, never>, Record<never, never>>,
   }
 }

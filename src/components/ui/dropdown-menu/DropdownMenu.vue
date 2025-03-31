@@ -4,7 +4,8 @@ import { DropdownMenuRoot, type DropdownMenuRootEmits, type DropdownMenuRootProp
 const props = defineProps<DropdownMenuRootProps>()
 const emits = defineEmits<DropdownMenuRootEmits>()
 
-const forwarded = useForwardPropsEmits(props, emits)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const forwarded: any = useForwardPropsEmits(props, emits)
 </script>
 
 <template>

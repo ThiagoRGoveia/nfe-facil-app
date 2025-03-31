@@ -9,7 +9,8 @@ import {
 const props = defineProps<NavigationMenuLinkProps>()
 const emits = defineEmits<NavigationMenuLinkEmits>()
 
-const forwarded = useForwardPropsEmits(props, emits)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const forwarded: any = useForwardPropsEmits(props, emits)
 </script>
 
 <template>

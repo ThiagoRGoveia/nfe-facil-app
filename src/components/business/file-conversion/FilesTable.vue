@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useLazyQuery } from '@vue/apollo-composable';
-import { FIND_ALL_FILES } from '@/graphql/history';
+import { useLazyQuery, useMutation } from '@vue/apollo-composable';
+import { FIND_ALL_FILES, PROCESS_FILE } from '@/graphql/history';
 import type { FileProcessStatus, FileRecord } from '@/graphql/generated/graphql';
 import {
   Table,
@@ -31,6 +31,8 @@ import {
   ChevronsUpDown,
   Download,
   Eye,
+  Loader2,
+  RotateCw,
 } from 'lucide-vue-next';
 import {
   Dialog,
@@ -88,6 +90,20 @@ const isDialogOpen = ref(false);
 const selectedFile = ref<FileItem | null>(null);
 const formattedJson = ref<string>('');
 
+// Download state
+const downloadingFile = ref<Record<string, boolean>>({});
+const downloadError = ref<string | null>(null);
+
+// Processing retry state
+const processingFile = ref<Record<string, boolean>>({});
+const processingError = ref<string | null>(null);
+const showConfirmDialog = ref(false);
+const fileToRetry = ref<FileItem | null>(null);
+
+const emit = defineEmits<{
+  (e: "error", message: string): void;
+}>();
+
 // Computed tableOptions for API call compatibility
 const tableOptions = computed<TableOptions>(() => ({
   page: currentPage.value,
@@ -127,6 +143,8 @@ const files = computed<FileItem[]>(() => {
 const totalItems = computed(() => result.value?.findAllFiles.total ?? 0);
 const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value));
 
+const { mutate: retryProcessFile } = useMutation(PROCESS_FILE);
+
 const columns = [
   {
     title: "Nome do Arquivo",
@@ -147,6 +165,11 @@ const columns = [
     title: "Status",  
     key: "status",
     sortable: true,
+  },
+  {
+    title: "Ações",
+    key: "actions",
+    sortable: false,
   },
 ];
 
@@ -174,10 +197,39 @@ const toggleSort = (columnKey: string) => {
   }
 };
 
-const handleDownload = (event: Event, item: FileItem) => {
+const handleDownload = async (event: Event, item: FileItem) => {
   event.stopPropagation();
-  // Handle file download here using item.filePath
-  console.log("Downloading file:", item.fileName);
+  
+  if (!item.filePath) {
+    downloadError.value = "Arquivo não disponível para download";
+    emit("error", downloadError.value);
+    return;
+  }
+  
+  try {
+    downloadingFile.value[item.id] = true;
+    const response = await fetch(item.filePath);
+    
+    if (!response.ok) {
+      throw new Error(`Falha ao baixar ${item.fileName}`);
+    }
+    
+    const blob = await response.blob();
+    const downloadUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = item.fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(downloadUrl);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : `Falha ao baixar ${item.fileName}`;
+    downloadError.value = errorMessage;
+    emit("error", errorMessage);
+  } finally {
+    downloadingFile.value[item.id] = false;
+  }
 };
 
 const handleRowClick = (item: FileItem) => {
@@ -215,6 +267,36 @@ const getStatusLabel = (status: FileProcessStatus) => {
     case 'PENDING': return 'Pendente';
     case 'PROCESSING': return 'Processando';
     default: return status;
+  }
+};
+
+const handleRetryClick = (event: Event, item: FileItem) => {
+  event.stopPropagation();
+  fileToRetry.value = item;
+  showConfirmDialog.value = true;
+};
+
+const handleRetry = async () => {
+  if (!fileToRetry.value) return;
+  
+  try {
+    const fileId = fileToRetry.value.id;
+    processingFile.value[fileId] = true;
+    await retryProcessFile({ fileId });
+    
+    // Refetch the files list after processing
+    await refetch();
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : `Falha ao reprocessar ${fileToRetry.value.fileName}`;
+    processingError.value = errorMessage;
+    emit("error", errorMessage);
+  } finally {
+    if (fileToRetry.value) {
+      processingFile.value[fileToRetry.value.id] = false;
+    }
+    // Close the dialog and reset the selected file
+    showConfirmDialog.value = false;
+    fileToRetry.value = null;
   }
 };
 
@@ -280,6 +362,9 @@ onMounted(() => {
             <TableCell class="text-center">
               <Skeleton class="h-6 w-24 mx-auto" />
             </TableCell>
+            <TableCell class="text-center">
+              <Skeleton class="h-8 w-8 mx-auto rounded-md" />
+            </TableCell>
           </TableRow>
         </template>
         
@@ -291,18 +376,28 @@ onMounted(() => {
           class="hover:bg-muted/50 cursor-pointer"
           @click="handleRowClick(item)"
         >
-          <TableCell>{{ item.fileName }}</TableCell>
+          <TableCell class="text-center">
+            {{ item.fileName }}
+          </TableCell>
           <TableCell class="text-center">
             <Button 
               variant="outline" 
               size="icon"
               title="Baixar arquivo"
+              :disabled="downloadingFile[item.id]"
               @click="(event) => handleDownload(event, item)"
             >
-              <Download class="h-4 w-4" />
+              <Download
+                v-if="!downloadingFile[item.id]"
+                class="h-4 w-4"
+              />
+              <Loader2
+                v-else
+                class="h-4 w-4 animate-spin"
+              />
             </Button>
           </TableCell>
-          <TableCell>
+          <TableCell class="text-center">
             <span
               v-if="item.error"
               class="text-destructive"
@@ -322,6 +417,24 @@ onMounted(() => {
             <Badge :variant="getBadgeVariant(item.status)">
               {{ getStatusLabel(item.status) }}
             </Badge>
+          </TableCell>
+          <TableCell class="text-center">
+            <Button 
+              variant="outline" 
+              size="icon"
+              title="Reprocessar arquivo"
+              :disabled="processingFile[item.id]"
+              @click="(event) => handleRetryClick(event, item)"
+            >
+              <RotateCw
+                v-if="!processingFile[item.id]"
+                class="h-4 w-4"
+              />
+              <Loader2
+                v-else
+                class="h-4 w-4 animate-spin"
+              />
+            </Button>
           </TableCell>
         </TableRow>
       </TableBody>
@@ -378,6 +491,43 @@ onMounted(() => {
       </Pagination>
     </div>
 
+    <!-- Confirmation Dialog -->
+    <Dialog v-model:open="showConfirmDialog">
+      <DialogScrollContent>
+        <DialogHeader>
+          <DialogTitle>Confirmação de Reprocessamento</DialogTitle>
+          <DialogDescription>
+            Você está prestes a reprocessar o arquivo "{{ fileToRetry?.fileName }}".
+          </DialogDescription>
+        </DialogHeader>
+        
+        <p class="my-4">
+          O reprocessamento de arquivos pode gerar custos adicionais dependendo do seu plano.
+          Deseja continuar com esta operação?
+        </p>
+        
+        <DialogFooter>
+          <Button 
+            variant="outline" 
+            @click="showConfirmDialog = false"
+          >
+            Cancelar
+          </Button>
+          <Button 
+            variant="default"
+            :disabled="processingFile[fileToRetry?.id || '']"
+            @click="handleRetry"
+          >
+            <Loader2
+              v-if="processingFile[fileToRetry?.id || '']"
+              class="h-4 w-4 mr-2 animate-spin"
+            />
+            Confirmar Reprocessamento
+          </Button>
+        </DialogFooter>
+      </DialogScrollContent>
+    </Dialog>
+    
     <!-- Results Dialog -->
     <Dialog v-model:open="isDialogOpen">
       <DialogScrollContent class="sm:max-w-3xl">

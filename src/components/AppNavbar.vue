@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
 import { MenuIcon } from "lucide-vue-next";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import logo from "@/assets/logo.svg";
+import logoDark from "@/assets/logo-dark.svg";
 
 type NavItem = {
   title: string;
@@ -29,8 +30,31 @@ type NavItem = {
 const mobileMenuOpen = ref(false);
 const auth = useAuthStore();
 const router = useRouter();
+const isDarkTheme = ref(false);
 
 const isAuthenticated = computed(() => auth.isAuthenticated);
+
+// Check if the current theme is dark
+const checkTheme = () => {
+  isDarkTheme.value = document.documentElement.classList.contains('dark');
+};
+
+// Listen for theme changes
+onMounted(() => {
+  checkTheme();
+  
+  // Create a mutation observer to detect theme changes
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'class') {
+        checkTheme();
+      }
+    });
+  });
+  
+  // Start observing the document with the configured parameters
+  observer.observe(document.documentElement, { attributes: true });
+});
 
 const handleAuth = () => {
   if (isAuthenticated.value) {
@@ -137,8 +161,8 @@ const navigateTo = (path: string, external = false) => {
         @click="navigateTo('/')"
       >
         <img
-          :src="logo"
-          alt="NFE Fácil"
+          :src="isDarkTheme ? logoDark : logo"
+          alt="Logo NFE Fácil"
           class="h-8"
         >
       </div>

@@ -24,7 +24,9 @@ const isEditing = ref(false);
     <Breadcrumb class="mb-4">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink @click="router.push('/dashboard')">Dashboard</BreadcrumbLink>
+          <BreadcrumbLink @click="router.push('/dashboard')">
+            Dashboard
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>

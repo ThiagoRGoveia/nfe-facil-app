@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { FileFormat } from "@/graphql/generated/graphql";
 import FileUploader from "./FileUploader.vue";
 
@@ -27,13 +27,6 @@ interface FormValues {
   formats: ValidFormat[];
 }
 
-interface FileError {
-  fileName: string;
-  error: string;
-}
-
-const fileErrors = ref<FileError[]>([]);
-const showErrors = ref(false);
 
 const outputFormats = [
   { label: "JSON", value: "JSON" as const },
@@ -71,7 +64,6 @@ const toggleFormat = (format: ValidFormat, checked: boolean | 'indeterminate') =
 };
 
 const onSubmit = form.handleSubmit((values: FormValues) => {
-  console.log('Form submitted!', values);
   // Uncomment to enable emit when ready
   emit("submit", {
     files: values.files,
@@ -91,22 +83,26 @@ const onSubmit = form.handleSubmit((values: FormValues) => {
       </CardHeader>
       
       <CardContent class="flex flex-col space-y-6 flex-grow">
-        <FormField v-slot="{ componentField }" name="files">
+        <FormField
+          name="files"
+        >
           <FormItem>
             <FormControl>
               <FileUploader
                 :files="form.values.files"
-                @update:files="(newFiles) => form.setFieldValue('files', newFiles)"
                 accept=".pdf,.zip"
                 class="flex-grow"
                 :max-files="props.maxFiles"
+                @update:files="(newFiles) => form.setFieldValue('files', newFiles)"
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField v-slot name="formats">
+        <FormField
+          name="formats"
+        >
           <FormItem>
             <FormLabel class="text-base font-medium mb-2 block">
               Escolha os formatos desejados

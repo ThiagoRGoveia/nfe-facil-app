@@ -54,3 +54,28 @@ export const FIND_BATCH_PROCESS_BY_ID = gql`
     }
   }
 `;
+
+export const PROCESS_FILE = gql`
+  mutation ProcessFile($fileId: String!) {
+    processFile(fileId: $fileId) {
+      id
+      fileName
+      filePath
+      status
+      result
+      error
+    }
+  }
+`;
+
+export const PROCESS_OUTPUT_CONSOLIDATION = gql`
+  mutation ProcessOutputConsolidation($batchId: String!) {
+    processOutputConsolidation(batchId: $batchId) {
+      id
+      status
+      jsonResults
+      csvResults
+      excelResults
+    }
+  }
+`;

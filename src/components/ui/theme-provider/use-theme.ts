@@ -37,7 +37,7 @@ export function useTheme() {
     
     // Force a repaint by accessing offsetHeight (causes a reflow)
     // This helps ensure CSS variables are properly reset
-    // eslint-disable-next-line no-unused-expressions
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     document.documentElement.offsetHeight
     
     // Set the new theme value which will trigger the watchEffect

@@ -3,7 +3,8 @@ import { DropdownMenuTrigger, type DropdownMenuTriggerProps, useForwardProps } f
 
 const props = defineProps<DropdownMenuTriggerProps>()
 
-const forwardedProps = useForwardProps(props)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const forwardedProps: any = useForwardProps(props)
 </script>
 
 <template>

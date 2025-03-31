@@ -67,7 +67,7 @@ const handleReset = () => {
     <!-- Show download cards if we have links -->
     <DownloadFileCards 
       v-if="hasLinks" 
-      :downloadLinks="downloadLinks"
+      :download-links="downloadLinks"
       @error="handleDownloadError"
     />
     
@@ -78,17 +78,25 @@ const handleReset = () => {
     />
     
     <!-- Show message if both links and errors are null but we have an error message -->
-    <div v-if="!hasLinks && errors.length === 0 && errorMessage" class="text-center py-8">
+    <div
+      v-if="!hasLinks && errors.length === 0 && errorMessage"
+      class="text-center py-8"
+    >
       <AlertTriangle class="h-16 w-16 text-destructive mx-auto mb-3" />
-      <p class="text-lg font-medium text-destructive">{{ errorMessage }}</p>
+      <p class="text-lg font-medium text-destructive">
+        {{ errorMessage }}
+      </p>
     </div>
     
     <!-- Try again button -->
-    <div v-if="!hideResetButton" class="mt-8 flex justify-center">
+    <div
+      v-if="!hideResetButton"
+      class="mt-8 flex justify-center"
+    >
       <Button 
         variant="outline"
-        @click="handleReset"
         class="px-8"
+        @click="handleReset"
       >
         {{ resetButtonText }}
       </Button>

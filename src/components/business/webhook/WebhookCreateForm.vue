@@ -17,7 +17,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -202,7 +201,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
           </FormField>
           
           <FormField 
-            v-slot
             name="authType"
           >
             <FormItem>
@@ -240,7 +238,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
             </h4>
             
             <FormField 
-              v-slot
               name="authConfig.username"
             >
               <FormItem>
@@ -257,7 +254,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
             </FormField>
             
             <FormField 
-              v-slot="{ field }"
               name="authConfig.password"
             >
               <FormItem>
@@ -285,7 +281,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
             </h4>
             
             <FormField 
-              v-slot="{ field }"
               name="authConfig.clientId"
             >
               <FormItem>
@@ -302,7 +297,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
             </FormField>
             
             <FormField 
-              v-slot="{ field }"
               name="authConfig.clientSecret"
             >
               <FormItem>
@@ -320,7 +314,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
             </FormField>
             
             <FormField 
-              v-slot="{ field }"
               name="authConfig.tokenUrl"
             >
               <FormItem>
@@ -347,7 +340,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
           </div>
           
           <FormField 
-            v-slot="{ field }"
             name="events"
           >
             <FormItem>

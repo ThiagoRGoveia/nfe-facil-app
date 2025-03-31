@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
-import { ref, defineExpose, useTemplateRef } from 'vue'
+import { defineExpose, useTemplateRef } from 'vue'
 
 const props = defineProps<{
   modelValue?: string | number

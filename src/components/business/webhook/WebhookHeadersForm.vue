@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, Plus } from 'lucide-vue-next';
@@ -63,7 +63,6 @@ const addHeader = () => {
       newHeadersObject[header.key] = header.value;
     }
   });
-  console.log('newHeadersObject', newHeadersObject);
   emit('update:modelValue', newHeadersObject);
 };
 
@@ -87,7 +86,6 @@ const removeHeader = (index: number) => {
 <template>
   <FormField
     :name="props.name"
-    v-slot="{ field }"
   >
     <FormItem class="space-y-4">
       <div class="flex items-center justify-between">
@@ -96,8 +94,8 @@ const removeHeader = (index: number) => {
           variant="outline" 
           size="sm" 
           class="rounded-full w-8 h-8 p-0"
-          @click="addHeader"
           type="button"
+          @click="addHeader"
         >
           <Plus class="h-4 w-4" />
           <span class="sr-only">Adicionar Header</span>
@@ -114,18 +112,18 @@ const removeHeader = (index: number) => {
             <div>
               <Input
                 :value="header.key"
-                @input="(e: Event) => updateHeader(index, 'key', (e.target as HTMLInputElement).value)"
                 placeholder="Nome do Header"
                 class="w-full"
+                @input="(e: Event) => updateHeader(index, 'key', (e.target as HTMLInputElement).value)"
               />
             </div>
             
             <div>
               <Input
                 :value="header.value"
-                @input="(e: Event) => updateHeader(index, 'value', (e.target as HTMLInputElement).value)"
                 placeholder="Valor"
                 class="w-full"
+                @input="(e: Event) => updateHeader(index, 'value', (e.target as HTMLInputElement).value)"
               />
             </div>
             
@@ -133,8 +131,8 @@ const removeHeader = (index: number) => {
               variant="ghost"
               size="sm"
               class="rounded-full p-0 w-8 h-8 mt-1"
-              @click="removeHeader(index)"
               type="button"
+              @click="removeHeader(index)"
             >
               <X class="h-4 w-4" />
               <span class="sr-only">Remover Header</span>

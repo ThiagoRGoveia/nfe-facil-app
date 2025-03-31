@@ -4,7 +4,10 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_DOC_URL: string
-  // add more env variables as needed
+  readonly VITE_GRAPHQL_URL: string
+  readonly VITE_NFE_TEMPLATE: string
+  readonly VITE_AUTH_URL: string
+  readonly VITE_ENV: string
 }
 
 interface ImportMeta {

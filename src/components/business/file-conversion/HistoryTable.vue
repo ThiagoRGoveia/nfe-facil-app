@@ -20,6 +20,7 @@ import {
   ChevronDown,
   ChevronUp,
   ChevronsUpDown,
+  RefreshCw,
 } from 'lucide-vue-next';
 import {
   Pagination,
@@ -65,6 +66,9 @@ const skeletonRowCount = 5;
 const sortColumn = ref('createdAt');
 const sortDirection = ref<'asc' | 'desc'>('desc');
 
+// Refresh state
+const isRefreshing = ref(false);
+
 // Computed tableOptions for API call compatibility
 const tableOptions = computed<TableOptions>(() => ({
   page: currentPage.value,
@@ -72,7 +76,7 @@ const tableOptions = computed<TableOptions>(() => ({
   sortBy: [{ key: sortColumn.value, order: sortDirection.value }],
 }));
 
-const { load, result, loading } = useLazyQuery<{ findAllBatchProcesses: PaginatedBatchProcessResponse }>(
+const { load, result, loading, refetch } = useLazyQuery<{ findAllBatchProcesses: PaginatedBatchProcessResponse }>(
   FIND_ALL_BATCH_PROCESSES,
   () => ({
     pagination: {
@@ -185,6 +189,19 @@ const handlePageChange = (page: number) => {
   currentPage.value = page;
 };
 
+// Add refresh function
+const refreshData = async () => {
+  isRefreshing.value = true;
+  try {
+    await refetch();
+  } finally {
+    // Reset the refreshing state after a short delay for visual feedback
+    setTimeout(() => {
+      isRefreshing.value = false;
+    }, 500);
+  }
+};
+
 onMounted(() => {
   load();
 });
@@ -196,6 +213,18 @@ const emit = defineEmits<{
 
 <template>
   <div class="relative min-h-[400px]">
+    <div class="flex justify-end mb-4">
+      <Button 
+        size="icon" 
+        variant="outline" 
+        :disabled="isRefreshing || loading"
+        title="Atualizar dados"
+        @click="refreshData"
+      >
+        <RefreshCw :class="['h-5 w-5', isRefreshing ? 'animate-spin' : '']" />
+      </Button>
+    </div>
+    
     <Table>
       <TableCaption v-if="itemsComputed.length === 0 && !loading">
         Nenhum item encontrado

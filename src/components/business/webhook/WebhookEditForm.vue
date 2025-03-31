@@ -3,7 +3,6 @@ import { ref, watch, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_WEBHOOK } from '@/graphql/webhooks';
 import type { 
-  WebhookFormValues, 
   BasicAuthConfig, 
   OAuth2Config, 
   WebhookItem, 
@@ -19,7 +18,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -242,7 +240,6 @@ watch(() => props.webhook, (newWebhook) => {
           </FormField>
           
           <FormField 
-            v-slot
             name="authType"
           >
             <FormItem>
@@ -280,7 +277,6 @@ watch(() => props.webhook, (newWebhook) => {
             </h4>
             
             <FormField 
-              v-slot
               name="authConfig.username"
             >
               <FormItem>
@@ -297,7 +293,6 @@ watch(() => props.webhook, (newWebhook) => {
             </FormField>
             
             <FormField 
-              v-slot
               name="authConfig.password"
             >
               <FormItem>
@@ -325,7 +320,6 @@ watch(() => props.webhook, (newWebhook) => {
             </h4>
             
             <FormField 
-              v-slot
               name="authConfig.clientId"
             >
               <FormItem>
@@ -342,7 +336,6 @@ watch(() => props.webhook, (newWebhook) => {
             </FormField>
             
             <FormField 
-              v-slot
               name="authConfig.clientSecret"
             >
               <FormItem>
@@ -360,7 +353,6 @@ watch(() => props.webhook, (newWebhook) => {
             </FormField>
             
             <FormField 
-              v-slot
               name="authConfig.tokenUrl"
             >
               <FormItem>
@@ -378,7 +370,6 @@ watch(() => props.webhook, (newWebhook) => {
           </div>
           
           <FormField 
-            v-slot
             name="events"
           >
             <FormItem>
@@ -408,7 +399,6 @@ watch(() => props.webhook, (newWebhook) => {
           </FormField>
           
           <FormField 
-            v-slot
             name="active"
           >
             <FormItem class="flex flex-row items-start space-x-3 space-y-0 p-2 border rounded-md">
