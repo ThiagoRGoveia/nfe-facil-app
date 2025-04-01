@@ -1,14 +1,40 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { CREATE_BATCH } from "@/graphql/private";
 import ConversionForm from "./ConversionForm.vue";
-import { Loader2 } from "lucide-vue-next";
+import { Loader2, Clock } from "lucide-vue-next";
 import { useToast } from "@/components/ui/toast/use-toast";
 import { FileFormat } from "@/graphql/generated/graphql";
 import { useRouter } from "vue-router";
 import { Button } from "@/components/ui/button";
 import { ApolloError } from "@apollo/client/core";
+import { 
+  Select, 
+  SelectTrigger, 
+  SelectValue, 
+  SelectContent, 
+  SelectItem 
+} from "@/components/ui/select";
+
+interface DocumentType {
+  id: string;
+  label: string;
+  available: boolean;
+}
+
+const documentTypes = ref<DocumentType[]>([
+  { id: 'nfse', label: 'Nota Fiscal de Serviço Eletrônica (NFS-e)', available: true },
+  { id: 'nfe', label: 'Nota Fiscal Eletrônica (NF-e) (Em breve)', available: false },
+  { id: 'nfce', label: 'Nota Fiscal ao Consumidor Eletrônica (NFC-e) (Em breve)', available: false },
+  { id: 'cfe', label: 'Cupom Fiscal Eletrônico (CF-e) (Em breve)', available: false },
+]);
+
+const selectedDocumentType = ref<string>('nfse');
+const isFeatureAvailable = computed(() => {
+  const selected = documentTypes.value.find(type => type.id === selectedDocumentType.value);
+  return selected?.available ?? false;
+});
 
 const router = useRouter();
 const loading = ref(false);
@@ -87,43 +113,80 @@ const handleTrackResults = () => {
 </script>
 
 <template>
-  <div class="h-full relative">
-    <!-- Show ConversionForm if not processing -->
-    <ConversionForm
-      v-if="!processing"
-      title="Extrair dados de Notas Fiscais em PDF"
-      @submit="handleSubmit"
-    />
-    
-    <!-- Show processing message after submission -->
-    <div 
-      v-else
-      class="flex flex-col items-center justify-center h-full p-6 text-center"
-    >
-      <div class="mb-4">
-        <Loader2 class="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-        <h3 class="text-xl font-semibold mb-2">
-          Extração em andamento
+  <div class="h-full relative flex flex-col">
+    <!-- Select dropdown always accessible -->
+    <div class="mb-4">
+      <Select 
+        v-model="selectedDocumentType"
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Selecione o tipo de documento" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem
+            v-for="type in documentTypes"
+            :key="type.id"
+            :value="type.id"
+          >
+            {{ type.label }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+
+    <!-- Form content area - can be blurred -->
+    <div class="flex-grow relative">
+      <!-- Coming soon overlay for unavailable features -->
+      <div
+        v-if="!isFeatureAvailable"
+        class="absolute inset-0 bg-background/70 backdrop-blur-lg z-10 flex flex-col items-center justify-center"
+      >
+        <Clock class="h-16 w-16 text-primary mb-4" />
+        <h3 class="text-2xl font-semibold mb-2">
+          Funcionalidade em breve!
         </h3>
-        <p class="text-muted-foreground mb-6">
-          Seus arquivos estão sendo processados. Você pode acompanhar o status ou enviar novos arquivos.
+        <p class="text-muted-foreground text-center max-w-md">
+          Este recurso estará disponível em breve.
         </p>
       </div>
       
-      <div class="flex gap-4">
-        <Button 
-          variant="default" 
-          @click="handleTrackResults"
-        >
-          Acompanhar resultados
-        </Button>
+      <!-- Show ConversionForm if not processing -->
+      <ConversionForm
+        v-if="!processing"
+        title="Extrair dados de Notas Fiscais em PDF"
+        @submit="handleSubmit"
+      />
+      
+      <!-- Show processing message after submission -->
+      <div 
+        v-else
+        class="flex flex-col items-center justify-center h-full p-6 text-center"
+      >
+        <div class="mb-4">
+          <Loader2 class="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+          <h3 class="text-xl font-semibold mb-2">
+            Extração em andamento
+          </h3>
+          <p class="text-muted-foreground mb-6">
+            Seus arquivos estão sendo processados. Você pode acompanhar o status ou enviar novos arquivos.
+          </p>
+        </div>
         
-        <Button 
-          variant="outline" 
-          @click="handleReset"
-        >
-          Enviar novos arquivos
-        </Button>
+        <div class="flex gap-4">
+          <Button 
+            variant="default" 
+            @click="handleTrackResults"
+          >
+            Acompanhar resultados
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            @click="handleReset"
+          >
+            Enviar novos arquivos
+          </Button>
+        </div>
       </div>
     </div>
   </div>
