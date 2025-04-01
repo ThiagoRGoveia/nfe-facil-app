@@ -209,7 +209,7 @@ const navigateTo = (path: string, external = false) => {
               :class="[navigationMenuTriggerStyle(), 'cursor-pointer']"
               @click="handleAuth"
             >
-              {{ isAuthenticated ? "Logout" : "Login" }}
+              {{ isAuthenticated ? "Sair" : "Entrar" }}
             </NavigationMenuLink>
           </NavigationMenuItem>
           

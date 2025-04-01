@@ -10,7 +10,7 @@ import type {
 import { webhookEvents, authTypes } from './WebhookTypes';
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -158,7 +158,7 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
 
 <template>
   <Dialog v-model:open="dialogOpen">
-    <DialogContent class="sm:max-w-[550px]">
+    <DialogScrollContent class="sm:max-w-[550px] max-h-[80vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>Criar Webhook</DialogTitle>
         <DialogDescription>
@@ -396,6 +396,6 @@ const toggleEvent = (event: WebhookEvent, checked: boolean | 'indeterminate') =>
           </Button>
         </DialogFooter>
       </form>
-    </DialogContent>
+    </DialogScrollContent>
   </Dialog>
 </template> 

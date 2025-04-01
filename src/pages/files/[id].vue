@@ -211,7 +211,7 @@ const processConsolidation = async () => {
     <Breadcrumb class="mb-4">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink @click="router.push('/dashboard')">
+          <BreadcrumbLink @click="router.push('/')">
             Dashboard
           </BreadcrumbLink>
         </BreadcrumbItem>

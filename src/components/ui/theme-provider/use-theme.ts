@@ -1,6 +1,6 @@
-import { ref, computed, watchEffect } from 'vue'
+import { ref, computed, watchEffect, nextTick } from 'vue'
 
-type Theme = 'light' | 'dark' | 'ai-future' | 'paper' | 'old-west' | 'queer-rock' | 'chaos' | 'harmony'
+type Theme = 'light' | 'dark' 
 
 const THEME_KEY = 'shadcn-vue-theme'
 
@@ -14,7 +14,7 @@ export function useTheme() {
   // Computed property to determine if we're using dark mode
   const isDarkMode = computed(() => {
     // Only the dark theme is considered dark mode for system purposes
-    return theme.value === 'dark' || theme.value === 'queer-rock' || theme.value === 'chaos'
+    return theme.value === 'dark'
   })
   
   // Computed property for the CSS class
@@ -26,33 +26,37 @@ export function useTheme() {
     localStorage.setItem(THEME_KEY, theme.value)
     
     // Update document class - remove all themes first then add the current one
-    document.documentElement.classList.remove('light', 'dark', 'ai-future', 'paper', 'old-west', 'queer-rock', 'chaos', 'harmony')
+    document.documentElement.classList.remove('light', 'dark')
     document.documentElement.classList.add(theme.value)
   })
   
   // Function to set the theme
   function setTheme(newTheme: Theme) {
-    // First remove all theme classes to ensure clean slate
-    document.documentElement.classList.remove('light', 'dark', 'ai-future', 'paper', 'old-west', 'queer-rock', 'chaos', 'harmony')
-    
-    // Force a repaint by accessing offsetHeight (causes a reflow)
-    // This helps ensure CSS variables are properly reset
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    document.documentElement.offsetHeight
-    
-    // Set the new theme value which will trigger the watchEffect
+    // Set the new theme value first
     theme.value = newTheme
     
-    // Add theme class immediately (in addition to the watchEffect)
-    document.documentElement.classList.add(newTheme)
+    // Use nextTick to ensure DOM updates are complete
+    nextTick(() => {
+      // Apply theme at document level and make sure it propagates
+      document.documentElement.classList.remove('light', 'dark')
+      document.documentElement.classList.add(newTheme)
+      
+      // Force style recalculation on the entire document
+      // This is more thorough than just accessing offsetHeight
+      const sheet = new CSSStyleSheet()
+      sheet.replaceSync(':root { --theme-refresh: 1; }')
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet]
+      
+      // Remove the temporary stylesheet after a short delay
+      setTimeout(() => {
+        document.adoptedStyleSheets = document.adoptedStyleSheets.filter(s => s !== sheet)
+      }, 0)
+    })
   }
   
   // Toggle between themes in order: cycling through all themes
   function toggleTheme() {
-    const themes: Theme[] = ['light', 'dark', 'ai-future', 'paper', 'old-west', 'queer-rock', 'chaos', 'harmony']
-    const currentIndex = themes.indexOf(theme.value)
-    const nextIndex = (currentIndex + 1) % themes.length
-    setTheme(themes[nextIndex])
+    setTheme(theme.value === 'light' ? 'dark' : 'light')
   }
   
   return {

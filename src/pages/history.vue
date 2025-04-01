@@ -33,7 +33,7 @@ const handleRowClick = (item: BatchProcess) => {
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink as-child>
-            <RouterLink to="/dashboard">
+            <RouterLink to="/">
               Dashboard
             </RouterLink>
           </BreadcrumbLink>

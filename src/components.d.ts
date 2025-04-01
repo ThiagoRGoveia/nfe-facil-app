@@ -83,7 +83,6 @@ declare module 'vue' {
     PrivateConversionForm: typeof import('./components/business/file-conversion/PrivateConversionForm.vue')['default']
     ProductCaroulsel: typeof import('./components/business/sales/ProductCaroulsel.vue')['default']
     ProfileCard: typeof import('./components/business/user/ProfileCard.vue')['default']
-    PublicConversionForm: typeof import('./components/business/file-conversion/PublicConversionForm.vue')['default']
     ResetPassword: typeof import('./components/business/user/ResetPassword.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
