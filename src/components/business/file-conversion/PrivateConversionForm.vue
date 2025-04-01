@@ -21,19 +21,45 @@ interface DocumentType {
   id: string;
   label: string;
   available: boolean;
+  title: string;
 }
 
 const documentTypes = ref<DocumentType[]>([
-  { id: 'nfse', label: 'Nota Fiscal de Serviço Eletrônica (NFS-e)', available: true },
-  { id: 'nfe', label: 'Nota Fiscal Eletrônica (NF-e) (Em breve)', available: false },
-  { id: 'nfce', label: 'Nota Fiscal ao Consumidor Eletrônica (NFC-e) (Em breve)', available: false },
-  { id: 'cfe', label: 'Cupom Fiscal Eletrônico (CF-e) (Em breve)', available: false },
+  { 
+    id: 'nfse', 
+    label: 'Nota Fiscal de Serviço Eletrônica (NFS-e)', 
+    available: true,
+    title: 'Extrair dados de Notas Fiscais de Serviço em PDF'
+  },
+  { 
+    id: 'nfe', 
+    label: 'Nota Fiscal Eletrônica (NF-e) (Em breve)', 
+    available: false,
+    title: 'Extrair dados de Notas Fiscais Eletrônicas em PDF'
+  },
+  { 
+    id: 'nfce', 
+    label: 'Nota Fiscal ao Consumidor Eletrônica (NFC-e) (Em breve)', 
+    available: false,
+    title: 'Extrair dados de Notas Fiscais ao Consumidor em PDF'
+  },
+  { 
+    id: 'cfe', 
+    label: 'Cupom Fiscal Eletrônico (CF-e) (Em breve)', 
+    available: false,
+    title: 'Extrair dados de Cupons Fiscais em PDF'
+  },
 ]);
 
 const selectedDocumentType = ref<string>('nfse');
 const isFeatureAvailable = computed(() => {
   const selected = documentTypes.value.find(type => type.id === selectedDocumentType.value);
   return selected?.available ?? false;
+});
+
+const formTitle = computed(() => {
+  const selected = documentTypes.value.find(type => type.id === selectedDocumentType.value);
+  return selected?.title ?? 'Extrair dados de documentos fiscais em PDF';
 });
 
 const router = useRouter();
@@ -115,7 +141,7 @@ const handleTrackResults = () => {
 <template>
   <div class="h-full relative flex flex-col">
     <!-- Select dropdown always accessible -->
-    <div class="mb-4">
+    <div class="px-6 pt-6 pb-2">
       <Select 
         v-model="selectedDocumentType"
       >
@@ -153,7 +179,7 @@ const handleTrackResults = () => {
       <!-- Show ConversionForm if not processing -->
       <ConversionForm
         v-if="!processing"
-        title="Extrair dados de Notas Fiscais em PDF"
+        :title="formTitle"
         @submit="handleSubmit"
       />
       
