@@ -8,9 +8,10 @@
         </div>
       </div>
     </main>
+    <AppFooter />
   </div>
 </template>
 
 <script lang="ts" setup>
-//
+import AppFooter from '@/components/AppFooter.vue';
 </script>

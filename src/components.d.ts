@@ -11,6 +11,7 @@ declare module 'vue' {
     AlertDescription: typeof import('./components/ui/alert/AlertDescription.vue')['default']
     AlertTitle: typeof import('./components/ui/alert/AlertTitle.vue')['default']
     ApiCredentials: typeof import('./components/business/user/ApiCredentials.vue')['default']
+    AppFooter: typeof import('./components/AppFooter.vue')['default']
     AppNavbar: typeof import('./components/AppNavbar.vue')['default']
     Badge: typeof import('./components/ui/badge/Badge.vue')['default']
     Breadcrumb: typeof import('./components/ui/breadcrumb/Breadcrumb.vue')['default']
