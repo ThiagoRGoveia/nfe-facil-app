@@ -50,7 +50,7 @@ const handleRowClick = (item: BatchProcess) => {
         Processing History
       </h1>
       <p class="text-muted-foreground">
-        View and manage your file processing history
+        Ver histórico de processamento de arquivos
       </p>
     </div>
 

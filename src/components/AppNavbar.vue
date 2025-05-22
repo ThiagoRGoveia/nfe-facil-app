@@ -73,6 +73,7 @@ const navItems = computed<NavItem[]>(() => [
         { title: "Perfil", icon: "user", to: "/profile" },
       ]
     : []),
+  { title: "Produtos", icon: "shopping-bag", to: "/products" },
   { title: "API", icon: "code", to: "/api-doc", external: true },
 ]);
 

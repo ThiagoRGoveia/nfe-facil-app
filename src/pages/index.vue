@@ -219,7 +219,7 @@ load();
                 class="flex items-center cursor-pointer hover:bg-muted p-2 rounded-md transition-colors"
                 role="button"
                 tabindex="0"
-                @click="router.push('/docs')"
+                @click="router.push('/api-doc')"
               >
                 <div class="bg-muted h-9 w-9 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
                   <FileText class="h-5 w-5" />
@@ -288,4 +288,4 @@ load();
 
 <style scoped>
 /* Add any custom styles here */
-</style> 
+</style>
