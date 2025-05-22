@@ -1,45 +1,39 @@
 <template>
-  <v-footer class="mt-8 pt-4 bg-surface">
-    <v-container>
-      <v-row
-        justify="space-between"
-        align="center"
-      >
-        <v-col
-          cols="12"
-          sm="6"
-        >
-          <div class="text-body-2 text-medium-emphasis">
+  <footer class="mt-8 pt-4 bg-background border-t">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col sm:flex-row justify-between items-center py-6">
+        <div class="w-full sm:w-1/2 mb-4 sm:mb-0">
+          <p class="text-sm text-muted-foreground">
             Copyright © {{ currentYear }} – Tera Solutions. Todos os direitos reservados.
-          </div>
-        </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-          class="d-flex justify-end"
-        >
-          <v-btn
-            variant="text"
-            class="text-caption text-medium-emphasis me-2"
-            to="/privacy"
+          </p>
+        </div>
+        <div class="w-full sm:w-1/2 flex justify-center sm:justify-end space-x-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            class="text-xs text-muted-foreground" 
+            asChild
           >
-            Política de Privacidade
-          </v-btn>
-          <v-btn
-            variant="text"
-            class="text-caption text-medium-emphasis"
-            to="/terms"
+            <RouterLink to="/privacy">Política de Privacidade</RouterLink>
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            class="text-xs text-muted-foreground" 
+            asChild
           >
-            Termos de Uso
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-footer>
+            <RouterLink to="/terms">Termos de Uso</RouterLink>
+          </Button>
+        </div>
+      </div>
+    </div>
+  </footer>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
+import { Button } from '@/components/ui/button';
+import { RouterLink } from 'vue-router';
 
 const currentYear = computed(() => new Date().getFullYear());
-</script> 
+</script>
