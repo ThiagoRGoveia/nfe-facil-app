@@ -289,11 +289,10 @@ const submitForm = async () => {
   
   try {
     // Extract base URL from the GraphQL URL
-    const baseUrl = import.meta.env.VITE_GRAPHQL_URL.replace('graphql', '');
-    const endpoint = `${baseUrl}public/contact-form`;
+    const baseUrl = import.meta.env.VITE_CONTACT_FORM_API_URL;
     
     // Submit form data
-    const response = await fetch(endpoint, {
+    const response = await fetch(baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
