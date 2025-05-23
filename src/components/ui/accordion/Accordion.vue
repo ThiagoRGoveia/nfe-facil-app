@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComputedRef } from 'vue'
 import {
   AccordionRoot,
   type AccordionRootEmits,
@@ -9,7 +10,7 @@ import {
 const props = defineProps<AccordionRootProps>()
 const emits = defineEmits<AccordionRootEmits>()
 
-const forwarded = useForwardPropsEmits(props, emits)
+const forwarded: ComputedRef<AccordionRootProps> = useForwardPropsEmits(props, emits)
 </script>
 
 <template>

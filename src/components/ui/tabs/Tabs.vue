@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { TabsRootEmits, TabsRootProps } from 'reka-ui'
 import { TabsRoot, useForwardPropsEmits } from 'reka-ui'
+import type { ComputedRef } from 'vue'
 
 const props = defineProps<TabsRootProps>()
 const emits = defineEmits<TabsRootEmits>()
 
-const forwarded = useForwardPropsEmits(props, emits)
+const forwarded: ComputedRef<TabsRootProps> = useForwardPropsEmits(props, emits)
 </script>
 
 <template>
