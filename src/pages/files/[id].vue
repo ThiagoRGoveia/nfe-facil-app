@@ -99,9 +99,14 @@ onMounted(() => {
 
 const isProcessing = computed(() => {
   return batchProcess.value && (
-    batchProcess.value.status === 'PROCESSING' || 
-    batchProcess.value.status === 'CREATED'
+    batchProcess.value.status === 'PROCESSING' 
   );
+});
+
+const isCompletedButProcessingResults = computed(() => {
+  return batchProcess.value && 
+    batchProcess.value.status === 'COMPLETED' && 
+    !hasDownloadLinks.value;
 });
 
 const handleError = (message: string) => {
@@ -341,6 +346,17 @@ const processConsolidation = async () => {
           hide-reset-button
           @error="handleError"
         />
+      </div>
+      
+      <!-- Results are being processed indicator (Completed but no download links) -->
+      <div
+        v-if="isCompletedButProcessingResults"
+        class="py-4 text-center"
+      >
+        <Loader2 class="h-8 w-8 animate-spin text-primary mx-auto mb-2" />
+        <p class="text-muted-foreground">
+          Processamento concluído! Os resultados estão sendo gerados e estarão disponíveis em breve.
+        </p>
       </div>
       
       <!-- Processing indicator if still processing -->
