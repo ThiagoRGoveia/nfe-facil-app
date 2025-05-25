@@ -1,15 +1,31 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-2">Perguntas Frequentes</h1>
-    <p class="text-muted-foreground mb-6">Respostas para as principais dúvidas sobre a API NFe-Fácil</p>
+    <h1 class="text-3xl font-bold mb-2">
+      Perguntas Frequentes
+    </h1>
+    <p class="text-muted-foreground mb-6">
+      Respostas para as principais dúvidas sobre a API NFe-Fácil
+    </p>
     <Separator class="mb-8" />
     
     <div class="max-w-4xl mx-auto">
-      <Tabs default-value="general" class="mb-8">
-        <TabsList class="grid w-full grid-cols-3">
-          <TabsTrigger value="general">Geral</TabsTrigger>
-          <TabsTrigger value="nfe">Processamento de NFe (API)</TabsTrigger>
-          <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+      <Tabs
+        default-value="general"
+        class="mb-8"
+      >
+        <TabsList class="grid w-full grid-cols-4">
+          <TabsTrigger value="general">
+            Geral
+          </TabsTrigger>
+          <TabsTrigger value="credits">
+            Créditos
+          </TabsTrigger>
+          <TabsTrigger value="nfe">
+            Processamento de NFe (API)
+          </TabsTrigger>
+          <TabsTrigger value="webhooks">
+            Webhooks
+          </TabsTrigger>
         </TabsList>
         
         <!-- Seção Geral -->
@@ -22,7 +38,11 @@
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Accordion type="single" collapsible class="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                class="w-full"
+              >
                 <AccordionItem value="q1">
                   <AccordionTrigger>O que é a API NFe-Fácil?</AccordionTrigger>
                   <AccordionContent>
@@ -55,6 +75,15 @@
                   <AccordionTrigger>A API NFe-Fácil é gratuita?</AccordionTrigger>
                   <AccordionContent>
                     <p>A API NFe-Fácil oferece um modelo de uso baseado em créditos, não há limites de uso ou prazo de expiração, créditos são acumuláveis e podem ser reabastecidos a qualquer momento. Consulte a página de preços para mais detalhes.</p>
+                    <Button
+                      variant="outline"
+                      class="mt-4"
+                      as-child
+                    >
+                      <RouterLink to="/products">
+                        Ver planos e preços
+                      </RouterLink>
+                    </Button>
                   </AccordionContent>
                 </AccordionItem>
 
@@ -62,9 +91,130 @@
                   <AccordionTrigger>Como posso obter suporte técnico?</AccordionTrigger>
                   <AccordionContent>
                     <p>Oferecemos suporte técnico por email e também através da nossa página de suporte. Para questões urgentes relacionadas à produção.</p>
-                    <Button variant="outline" class="mt-4" asChild>
-                      <RouterLink to="/support">Ir para Suporte</RouterLink>
+                    <Button
+                      variant="outline"
+                      class="mt-4"
+                      as-child
+                    >
+                      <RouterLink to="/support">
+                        Ir para Suporte
+                      </RouterLink>
                     </Button>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <!-- Seção Créditos -->
+        <TabsContent value="credits">
+          <Card>
+            <CardHeader>
+              <CardTitle>Créditos e Pagamentos</CardTitle>
+              <CardDescription>
+                Informações sobre como funcionam os créditos e como adquiri-los
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Accordion
+                type="single"
+                collapsible
+                class="w-full"
+              >
+                <AccordionItem value="cr1">
+                  <AccordionTrigger>O que são créditos e como eles funcionam?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Créditos são a forma de pagamento da plataforma NFe-Fácil. Cada crédito permite processar 1 operação de NFSe (Nota Fiscal de Serviço Eletrônica). Ao adquirir um pacote de créditos, você pode utilizá-los para processar o mesmo número de documentos.</p>
+                    <p class="mt-2">
+                      Por exemplo, se você adquirir 100 créditos, poderá processar até 100 NFSe através da nossa API.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="cr2">
+                  <AccordionTrigger>Os créditos expiram?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Não, os créditos adquiridos na plataforma NFe-Fácil <strong>não expiram</strong>. Você pode utilizá-los a qualquer momento, conforme sua necessidade, sem preocupação com prazos de validade.</p>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="cr3">
+                  <AccordionTrigger>Como posso adquirir créditos?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Você pode adquirir créditos de forma simples através da nossa página de produtos. Oferecemos três pacotes diferentes:</p>
+                    <ul class="list-disc pl-6 mt-2 space-y-1">
+                      <li><strong>Pacote Básico:</strong> 100 créditos</li>
+                      <li><strong>Pacote Padrão:</strong> 200 créditos</li>
+                      <li><strong>Pacote Mega:</strong> 500 créditos</li>
+                    </ul>
+                    <p class="mt-2">
+                      Após a compra, os créditos são adicionados automaticamente à sua conta e ficam disponíveis para uso imediato.
+                    </p>
+                    <Button
+                      variant="outline"
+                      class="mt-4"
+                      as-child
+                    >
+                      <RouterLink to="/products">
+                        Ver pacotes disponíveis
+                      </RouterLink>
+                    </Button>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="cr4">
+                  <AccordionTrigger>Como visualizo meu saldo de créditos?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Seu saldo de créditos está sempre visível no painel principal do seu Dashboard. Além disso, você pode acessar o histórico detalhado de uso na seção "Créditos" do seu perfil, onde é possível verificar:</p>
+                    <ul class="list-disc pl-6 mt-2 space-y-1">
+                      <li>Saldo atual de créditos</li>
+                      <li>Histórico de compras de créditos</li>
+                      <li>Histórico de uso de créditos</li>
+                      <li>Relatórios de consumo</li>
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="cr5">
+                  <AccordionTrigger>O que acontece se meus créditos acabarem durante um processamento?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Se seus créditos acabarem durante o processamento de um lote, o sistema irá:</p>
+                    <ol class="list-decimal pl-6 mt-2 space-y-1">
+                      <li>Processar apenas os documentos para os quais você tem créditos suficientes</li>
+                      <li>Pausar o processamento do restante dos documentos</li>
+                      <li>Notificar você sobre a necessidade de adquirir mais créditos</li>
+                    </ol>
+                    <p class="mt-2">
+                      Após adquirir mais créditos, você pode retomar o processamento dos documentos restantes sem perder o trabalho já realizado.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="cr6">
+                  <AccordionTrigger>Posso comprar créditos para uso futuro?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Sim! Muitos clientes preferem adquirir créditos antecipadamente para garantir melhor custo-benefício aproveitando nossos pacotes com preços escalonados. Como os créditos não expiram, você pode adquirir uma quantidade maior e utilizá-los conforme sua necessidade ao longo do tempo.</p>
+                    <p class="mt-2">
+                      Quanto maior o pacote adquirido, menor o preço por crédito individual.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="cr7">
+                  <AccordionTrigger>Posso transferir créditos entre contas?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Atualmente, não oferecemos a possibilidade de transferência de créditos entre contas diferentes. Os créditos são associados especificamente à conta que os adquiriu.</p>
+                    <p class="mt-2">
+                      Se você precisar de uma solução específica para sua empresa ou equipe, entre em contato com nosso suporte para discutir opções personalizadas.
+                    </p>
+                  </AccordionContent>
+                </AccordionItem>
+                
+                <AccordionItem value="cr8">
+                  <AccordionTrigger>Recebo nota fiscal pela compra de créditos?</AccordionTrigger>
+                  <AccordionContent>
+                    <p>Sim, para todas as compras de créditos emitimos automaticamente uma nota fiscal de serviço que será enviada para o e-mail cadastrado em sua conta. A nota é geralmente emitida em até 24 horas após a confirmação do pagamento.</p>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -82,12 +232,18 @@
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Accordion type="single" collapsible class="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                class="w-full"
+              >
                 <AccordionItem value="nfe1">
                   <AccordionTrigger>Qual a diferença entre o processamento síncrono e assíncrono de NFe?</AccordionTrigger>
                   <AccordionContent>
                     <p><strong>Síncrono:</strong> Processa um único arquivo de NFe imediatamente. A resposta da API conterá os dados extraídos diretamente. Isso é adequado para processar um arquivo por vez, onde um resultado imediato é necessário.</p>
-                    <p class="mt-2"><strong>Assíncrono:</strong> Projetado para processar múltiplos arquivos (lotes) de forma eficiente. Você cria um lote, adiciona arquivos a ele e, em seguida, inicia o processamento. A API responde imediatamente após iniciar o processo em segundo plano, e você pode acompanhar o status ou receber notificações via webhooks ao final do processamento.</p>
+                    <p class="mt-2">
+                      <strong>Assíncrono:</strong> Projetado para processar múltiplos arquivos (lotes) de forma eficiente. Você cria um lote, adiciona arquivos a ele e, em seguida, inicia o processamento. A API responde imediatamente após iniciar o processo em segundo plano, e você pode acompanhar o status ou receber notificações via webhooks ao final do processamento.
+                    </p>
                   </AccordionContent>
                 </AccordionItem>
                 
@@ -107,7 +263,9 @@
                       <li>Adicione seus arquivos a este lote (você pode adicionar múltiplos arquivos ou ZIPs)</li>
                       <li>Acione o processamento assíncrono para o lote</li>
                     </ol>
-                    <p class="mt-2">Para monitorar o progresso, você pode verificar o status do lote periodicamente ou configurar webhooks para receber notificações automáticas.</p>
+                    <p class="mt-2">
+                      Para monitorar o progresso, você pode verificar o status do lote periodicamente ou configurar webhooks para receber notificações automáticas.
+                    </p>
                   </AccordionContent>
                 </AccordionItem>
                 
@@ -165,7 +323,9 @@
                       <li>O arquivo está corrompido ou protegido por senha</li>
                       <li>O formato da NFe não é suportado atualmente</li>
                     </ul>
-                    <p class="mt-2">Para processamento em lote, a falha em um arquivo não afeta o processamento dos demais arquivos no lote.</p>
+                    <p class="mt-2">
+                      Para processamento em lote, a falha em um arquivo não afeta o processamento dos demais arquivos no lote.
+                    </p>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
@@ -183,7 +343,11 @@
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Accordion type="single" collapsible class="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                class="w-full"
+              >
                 <AccordionItem value="wh1">
                   <AccordionTrigger>Para que servem os Webhooks na API NFe-Fácil?</AccordionTrigger>
                   <AccordionContent>
@@ -269,28 +433,48 @@
         </CardHeader>
         <CardContent>
           <div class="grid gap-4 sm:grid-cols-2">
-            <Button variant="outline" class="justify-start" asChild>
-              <a href="https://docs.nfe-facil.com" target="_blank" rel="noopener noreferrer">
+            <Button
+              variant="outline"
+              class="justify-start"
+              as-child
+            >
+              <a
+                href="https://docs.nfe-facil.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FileText class="mr-2 h-4 w-4" />
                 Documentação Completa da API
               </a>
             </Button>
             
-            <Button variant="outline" class="justify-start" as-child>
+            <Button
+              variant="outline"
+              class="justify-start"
+              as-child
+            >
               <RouterLink to="/support">
                 <LifeBuoy class="mr-2 h-4 w-4" />
                 Suporte Técnico
               </RouterLink>
             </Button>
             
-            <Button variant="outline" class="justify-start" as-child>
+            <Button
+              variant="outline"
+              class="justify-start"
+              as-child
+            >
               <RouterLink to="/">
                 <LayoutDashboard class="mr-2 h-4 w-4" />
                 Acessar Dashboard
               </RouterLink>
             </Button>
             
-            <Button variant="outline" class="justify-start" as-child>
+            <Button
+              variant="outline"
+              class="justify-start"
+              as-child
+            >
               <RouterLink to="/privacy">
                 <Lock class="mr-2 h-4 w-4" />
                 Privacidade
@@ -303,10 +487,16 @@
       <!-- CTA de Contato -->
       <div class="mt-8 bg-muted p-6 rounded-lg">
         <div class="text-center">
-          <h3 class="text-xl font-semibold mb-2">Não encontrou o que procurava?</h3>
-          <p class="mb-4">Nossa equipe de suporte está pronta para ajudar com suas dúvidas específicas.</p>
-          <Button asChild>
-            <RouterLink to="/support">Entrar em contato</RouterLink>
+          <h3 class="text-xl font-semibold mb-2">
+            Não encontrou o que procurava?
+          </h3>
+          <p class="mb-4">
+            Nossa equipe de suporte está pronta para ajudar com suas dúvidas específicas.
+          </p>
+          <Button as-child>
+            <RouterLink to="/support">
+              Entrar em contato
+            </RouterLink>
           </Button>
         </div>
       </div>
