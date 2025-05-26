@@ -1,12 +1,32 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
+import { useRoute } from 'vue-router'
 
 onMounted(() => {
-  // Get the authentication URL from environment variables
-  const authUrl = import.meta.env.VITE_AUTH_URL
+  const { loginWithRedirect } = useAuth0()
+  const route = useRoute()
+
+  // Get the original redirect URL if present
+  const redirectPath = route.query.redirect as string | undefined
   
-  // Redirect to the authentication URL
-  window.location.href = authUrl
+  // Get purchase related query params if present
+  const refParam = route.query.ref as string | undefined
+  const productParam = route.query.product as string | undefined
+  
+  // Create appState to preserve through auth flow
+  const appState = {
+    // Store the original redirect path if present
+    returnTo: redirectPath,
+    // Store purchase params if present
+    purchaseRef: refParam,
+    purchaseProduct: productParam
+  }
+  
+  // Redirect to Auth0 login with our appState
+  loginWithRedirect({
+    appState
+  })
 })
 </script>
 
@@ -43,4 +63,4 @@ onMounted(() => {
       </v-col>
     </v-row>
   </v-container>
-</template> 
+</template>

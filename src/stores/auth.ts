@@ -17,6 +17,7 @@ export const useAuthStore = defineStore("auth", () => {
     loginWithRedirect,
     logout: auth0Logout,
     getAccessTokenSilently,
+    handleRedirectCallback,
   } = useAuth0();
 
   async function fetchGraphQLUser() {
@@ -92,6 +93,26 @@ export const useAuthStore = defineStore("auth", () => {
     return await getAccessTokenSilently();
   }
 
+  async function getAppState() {
+    try {
+      // Get the current URL query parameters
+      const query = window.location.search;
+      
+      // If there are query parameters and we're on a redirect callback
+      if (query && query.includes('state=') && query.includes('code=')) {
+        // Handle the redirect and extract appState
+        const { appState } = await handleRedirectCallback();
+        return appState;
+      }
+      
+      // No appState available
+      return null;
+    } catch (error) {
+      console.error('Error getting appState:', error);
+      return null;
+    }
+  }
+
   return {
     auth0User,
     user,
@@ -102,5 +123,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     logout,
     getToken,
+    getAppState,
   };
 });

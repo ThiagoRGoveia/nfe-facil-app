@@ -3,7 +3,8 @@ export const publicRoutes = [
   "/login", 
   "/callback", 
   "/error", 
-  "/api-doc"
+  "/api-doc",
+  "/checkout"
 ] as const;
 
 export type PublicRoute = (typeof publicRoutes)[number];

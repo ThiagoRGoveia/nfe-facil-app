@@ -25,6 +25,22 @@ router.beforeEach(async (to) => {
     await auth.initialize();
   }
 
+  // Check for appState in Auth0 redirect
+  if (to.path === '/' && auth.isAuthenticated) {
+    // Get the appState from Auth0
+    const appState = await auth.getAppState();
+    
+    // If we have purchase parameters in appState, redirect to checkout
+    if (appState?.purchaseRef === 'purchase' && appState?.purchaseProduct) {
+      return `/checkout?product=${appState.purchaseProduct}`;
+    }
+    
+    // If we have a returnTo path in appState, redirect there
+    if (appState?.returnTo) {
+      return appState.returnTo;
+    }
+  }
+
   // Allow public routes
   if (isPublicRoute(to.path)) {
     return true;
