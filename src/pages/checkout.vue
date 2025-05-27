@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const isLoading = ref(true)
 const error = ref<string | null>(null)
@@ -51,8 +52,9 @@ onMounted(async () => {
     const userId = auth.user?.id
     const finalUrl = `${stripeUrl}${stripeUrl.includes('?') ? '&' : '?'}client_reference_id=${userId}`
     
-    // Redirect to Stripe
-    window.location.href = finalUrl
+    // Open Stripe checkout in a new tab and redirect current tab to home
+    window.open(finalUrl, '_blank', 'noopener')
+    router.replace('/')
     
   } catch (err) {
     console.error('Error redirecting to Stripe:', err)
