@@ -112,7 +112,6 @@ declare module 'vue' {
     SheetHeader: typeof import('./components/ui/sheet/SheetHeader.vue')['default']
     SheetTitle: typeof import('./components/ui/sheet/SheetTitle.vue')['default']
     SheetTrigger: typeof import('./components/ui/sheet/SheetTrigger.vue')['default']
-    SignupForm: typeof import('./components/business/user/SignupForm.vue')['default']
     Skeleton: typeof import('./components/ui/skeleton/Skeleton.vue')['default']
     Table: typeof import('./components/ui/table/Table.vue')['default']
     TableBody: typeof import('./components/ui/table/TableBody.vue')['default']

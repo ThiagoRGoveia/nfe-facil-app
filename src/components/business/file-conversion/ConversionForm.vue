@@ -130,6 +130,9 @@ const onSubmit = form.handleSubmit((values: FormValues) => {
             <FormMessage />
           </FormItem>
         </FormField>
+        <p class="text-xs text-muted-foreground mt-4 px-1 text-left text-red-500">
+          *Utilizamos IA para extrair dados. Verifique sempre os resultados, pois podem ocorrer imprecisões.
+        </p>
       </CardContent>
       
       <CardFooter>

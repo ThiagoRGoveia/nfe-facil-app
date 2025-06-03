@@ -49,6 +49,9 @@
       
       <h2 class="text-2xl font-semibold mt-6 mb-4">9. Isenção de Garantias</h2>
       <p>O Serviço é fornecido "como está" e "conforme disponível" sem garantias de qualquer tipo, expressas ou implícitas. Não garantimos que o Serviço atenderá aos seus requisitos específicos, que será ininterrupto, seguro ou livre de erros.</p>
+      <p class="mt-2">
+        Adicionalmente, o Serviço pode empregar tecnologias de inteligência artificial (IA) para otimizar funcionalidades, como a extração e conversão de dados. Apesar de nossos esforços para garantir a alta precisão, a natureza da IA implica que podem ocorrer imprecisões ou erros. O usuário reconhece e concorda que é sua exclusiva responsabilidade verificar a exatidão, completude e adequação de qualquer informação ou dado gerado ou processado pelo Serviço com auxílio de IA antes de sua utilização para quaisquer fins.
+      </p>
       
       <h2 class="text-2xl font-semibold mt-6 mb-4">10. Rescisão</h2>
       <p>Podemos encerrar ou suspender sua conta e o acesso ao Serviço imediatamente, sem aviso prévio ou responsabilidade, por qualquer motivo, incluindo, sem limitação, se você violar estes Termos. Após a rescisão, seu direito de usar o Serviço cessará imediatamente.</p>
