@@ -1,6 +1,6 @@
 # NFe Fácil App
 
-A modern web application for NFSe (Nota Fiscal de Serviços Eletrônica) management, built with Vue 3, Vite, Tailwind CSS, and a rich ecosystem of modern tools.
+This repository contains for a demo app for an application that uses LLMs to extract information from invoices.
 
 **Version:** 0.0.0
 
